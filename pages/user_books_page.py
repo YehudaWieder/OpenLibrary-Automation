@@ -18,6 +18,11 @@ class UserBooksPage(BasePage):
 
     async def _extract_count(self, locator: str) -> int:
         """Extract numeric count from a list widget label."""
+        # Check if locator exists first
+        if await self.page.locator(locator).count() == 0:
+            self.logger.info(f"Locator not found: {locator}")
+            return 0
+    
         text = await self.get_text(locator)
         match = re.search(r"\((\d+)\)", text)
         return int(match.group(1)) if match else 0
