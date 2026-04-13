@@ -5,8 +5,14 @@
   "TIMEOUT": 30000,
   "TEST_DATA_PATH": "data/test_data.json",
   "PERFORMANCE_THRESHOLDS": {
+    "search_page_first_paint_ms": 3000,
+    "search_page_dom_content_loaded_ms": 3000,
     "search_page_load_time_ms": 3000,
+    "book_page_first_paint_ms": 2500,
+    "book_page_dom_content_loaded_ms": 2500,
     "book_page_load_time_ms": 2500,
+    "reading_list_first_paint_ms": 2000,
+    "reading_list_dom_content_loaded_ms": 2000,
     "reading_list_load_time_ms": 2000
   }
 }

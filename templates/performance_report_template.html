@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Performance Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f2f4f8;
+      --paper: #ffffff;
+      --ink: #122023;
+      --muted: #5a6772;
+      --line: #dbe3ea;
+      --brand: #0d9488;
+      --brand-soft: #ccfbf1;
+      --warn: #b45309;
+      --warn-soft: #ffedd5;
+      --ok: #166534;
+      --ok-soft: #dcfce7;
+      --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+      --radius-xl: 18px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -15%, #dff7f4 0%, transparent 60%),
+        radial-gradient(1000px 440px at 90% -20%, #dbeafe 0%, transparent 55%),
+        var(--bg);
+      line-height: 1.45;
+    }
+
+    .container {
+      width: min(1200px, 92vw);
+      margin: 28px auto 42px;
+    }
+
+    .hero {
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, #0f766e, #0ea5e9);
+      color: #f8fafc;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      font-family: "Sora", "Segoe UI", sans-serif;
+      letter-spacing: 0.3px;
+      margin: 0 0 8px;
+      font-size: clamp(1.4rem, 2.6vw, 2rem);
+    }
+
+    .hero p {
+      margin: 4px 0;
+      opacity: 0.95;
+      font-size: 0.95rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      backdrop-filter: blur(3px);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.78rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .run {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      animation: rise 320ms ease both;
+    }
+
+    .run h2 {
+      margin: 0 0 4px;
+      font-family: "Sora", "Segoe UI", sans-serif;
+      font-size: 1.04rem;
+    }
+
+    .run > p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .run h3 {
+      margin: 14px 0 8px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      letter-spacing: 0.01em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #f8fbfd;
+      color: #334155;
+      font-weight: 700;
+      width: 27%;
+    }
+
+    tr:last-child th,
+    tr:last-child td { border-bottom: none; }
+
+    .shots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .shot {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .shot:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+    }
+
+    .shot img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #e2e8f0;
+    }
+
+    .shot p {
+      font-size: 11px;
+      word-break: break-all;
+      margin: 7px 0 0;
+      color: var(--muted);
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+
+    .status-ok {
+      background: var(--ok-soft);
+      color: var(--ok);
+      border-color: #bbf7d0;
+    }
+
+    .status-exceeded {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-color: #fed7aa;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 720px) {
+      .container { width: 94vw; margin-top: 18px; }
+      .hero { padding: 16px; }
+      .run { padding: 12px; }
+      th, td { padding: 7px; font-size: 0.84rem; }
+      .shot img { height: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Automation Performance Report</h1>
+      <p>Historical run analytics, screenshots, thresholds, and execution context.</p>
+      <div class="stats">
+        <div class="stat-card"><span class="stat-label">Last Updated</span><span class="stat-value">{{LAST_UPDATED}}</span></div>
+        <div class="stat-card"><span class="stat-label">Total Runs</span><span class="stat-value">{{TOTAL_RUNS}}</span></div>
+        <div class="stat-card"><span class="stat-label">Total Metrics</span><span class="stat-value">{{TOTAL_METRICS}}</span></div>
+      </div>
+    </section>
+
+    <div class="meta"></div>
+    {{RUN_SECTIONS}}
+  </div>
+
+  <script>
+    (function () {
+      const statusCells = document.querySelectorAll('.run table td:last-child');
+      statusCells.forEach((cell) => {
+        const text = (cell.textContent || '').trim().toUpperCase();
+        if (text === 'OK') {
+          cell.innerHTML = '<span class="status-badge status-ok">OK</span>';
+        } else if (text === 'EXCEEDED') {
+          cell.innerHTML = '<span class="status-badge status-exceeded">EXCEEDED</span>';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

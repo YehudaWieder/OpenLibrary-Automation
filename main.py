@@ -1,6 +1,7 @@
 # main.py
 import asyncio
 import logging
+from pathlib import Path
 from playwright.async_api import async_playwright
 
 # Imports from your pages
@@ -19,6 +20,23 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("MainRunner")
+
+
+def _collect_latest_screenshots_for_urls(urls: list[str]) -> list[str]:
+    """Collect the latest screenshot path for each added book URL."""
+    screenshots_dir = Path("screenshots")
+    if not screenshots_dir.exists():
+        return []
+
+    collected: list[str] = []
+    for url in urls:
+        book_id = url.rstrip("/").split("/")[-1]
+        matches = list(screenshots_dir.glob(f"*_book_{book_id}.png"))
+        if not matches:
+            continue
+        latest = max(matches, key=lambda p: p.stat().st_mtime)
+        collected.append(str(latest))
+    return collected
 
 async def run_test():
     perf_helper = PerformanceHelper()
@@ -47,6 +65,11 @@ async def run_test():
             search_query = test_data.get("search_query")
             max_year = test_data.get("max_year")
             limit = test_data.get("limit")
+            perf_helper.set_run_context(
+                search_query=search_query,
+                max_year=max_year,
+                limit=limit,
+            )
 
             home_page = HomePage(page)
             book_urls = await search_books_by_title_under_year(
@@ -67,6 +90,11 @@ async def run_test():
             details_page = BookDetailsPage(page)
             
             await details_page.add_books_to_reading_list(book_urls)                
+            perf_helper.set_run_context(
+                added_book_urls=book_urls,
+                added_books_count=len(book_urls),
+                screenshots=_collect_latest_screenshots_for_urls(book_urls),
+            )
 
             # 5. Assertion Phase (Task #3)
             user_books_page = UserBooksPage(page)
@@ -76,6 +104,10 @@ async def run_test():
                 user_books_page=user_books_page,
                 expected_count=len(book_urls),
             )
+            perf_helper.set_run_context(
+                expected_count=len(book_urls),
+                actual_count=actual_count,
+            )
 
             logger.info("TEST PASSED: Books successfully added to reading list.")
 
@@ -84,6 +116,11 @@ async def run_test():
         
         finally:
             await perf_helper.save_performance_report()
+            try:
+                html_path = perf_helper.generate_html_report()
+                perf_helper.open_html_report(html_path)
+            except Exception as report_error:
+                logger.warning("Could not open HTML report automatically: %s", report_error)
             logger.info("Closing browser.")
             await browser.close()
 
