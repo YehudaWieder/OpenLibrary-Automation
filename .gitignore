@@ -88,3 +88,6 @@ package-lock.json
 dmypy.json
 .pyre/
 .cache/
+
+
+performance_report.json

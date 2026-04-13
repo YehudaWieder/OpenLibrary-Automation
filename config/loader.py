@@ -50,6 +50,12 @@ def _parse_scalar(value: Any) -> Any:
     if isinstance(value, (int, float)):
         return value
 
+    if isinstance(value, dict):
+        return {key: _parse_scalar(val) for key, val in value.items()}
+
+    if isinstance(value, list):
+        return [_parse_scalar(item) for item in value]
+
     text = str(value).strip()
     lowered = text.lower()
 
