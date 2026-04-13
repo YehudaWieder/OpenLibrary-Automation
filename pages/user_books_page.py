@@ -1,12 +1,15 @@
 #pages/user_books_page.py
+from itertools import count
 import re
 from pages.base_page import BasePage
 from config import Config
 
 class UserBooksPage(BasePage):
     # Selectors based on your input
-    WANT_TO_READ_BUTTON = "text=Want to Read"
-    ALREADY_READ_BUTTON = "text=Already Read"
+    WANT_TO_READ_BUTTON = "a[data-ol-link-track='BookCarousel|HeaderClick|want-to-read']"
+    ALREADY_READ_BUTTON = "a[data-ol-link-track='BookCarousel|HeaderClick|already-read']"
+    BOOK_ITEM = ".searchResultItem"
+    BOOK_TOGGLE_BUTTON = "button.book-progress-btn"
 
     async def open(self):
         """Navigate to the user's books overview page."""
@@ -34,3 +37,34 @@ class UserBooksPage(BasePage):
         total = want + already
         self.logger.info(f"Reading list totals: Want={want}, Already={already}, Total={total}")
         return total
+
+    async def clear_list(self, list_button: str) -> None:
+        # Check if the list button exists before clicking
+        if await self.page.locator(list_button).count() == 0:
+            self.logger.info(f"List button not found: {list_button}")
+            return
+        
+        await self.click(list_button)
+        await self.page.wait_for_load_state("networkidle")
+        
+        while True:
+            items = self.page.locator(self.BOOK_ITEM)
+            count = await items.count()
+            
+            if count == 0:
+                break
+            
+            btn = items.first.locator(self.BOOK_TOGGLE_BUTTON)
+            await btn.click()
+            await self.page.wait_for_load_state("networkidle")
+            await self.page.reload()
+
+    async def clear_reading_lists(self) -> None:
+        """Clear all books from both Want to Read and Already Read lists."""
+        await self.open()
+        await self.clear_list(self.WANT_TO_READ_BUTTON)
+        await self.page.wait_for_load_state("networkidle")
+        
+        await self.open()
+        await self.clear_list(self.ALREADY_READ_BUTTON)
+        self.logger.info("Cleared all reading lists")

@@ -35,6 +35,10 @@ async def run_test():
             await login_page.open_login()
             await login_page.login(Config.EMAIL_INPUT, Config.PASSWORD_INPUT)
 
+            # Clear existing reading lists to prevent toggle issues
+            user_books_page = UserBooksPage(page)
+            await user_books_page.clear_reading_lists()
+
             # 3. Search Phase (Task #1)
             test_data = load_test_data(Config.TEST_DATA_PATH)
             search_query = test_data.get("search_query")
