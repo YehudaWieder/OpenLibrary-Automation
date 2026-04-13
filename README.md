@@ -1,232 +1,201 @@
 # OpenLibrary Automation Framework
 
-Professional test automation framework for OpenLibrary using Playwright, Page Object Model pattern, and async/await programming with asyncio.
+End-to-end automation framework for OpenLibrary using Playwright (Python), built with a Page Object Model (POM) design and SRP-oriented architecture.
 
-## Architecture Overview
+## Overview
 
-### Design Patterns & Principles
-- **Page Object Model (POM)**: Encapsulates page elements and interactions in page classes
-- **Single Responsibility Principle (SRP)**: Each class handles one specific concern
-- **Async/Await**: Concurrent test execution using asyncio and pytest-asyncio
-- **Data-Driven Testing**: External test data in JSON format
-- **Allure Reporting**: Detailed test reports with metrics and screenshots
+This project automates the following flow:
 
-### Project Structure
+1. Login to OpenLibrary.
+2. Search books by keyword.
+3. Filter books by publication year and limit the result count.
+4. Add selected books to reading lists (randomly choosing allowed statuses).
+5. Validate reading list totals.
+6. Measure performance metrics during the run.
+7. Generate JSON + HTML performance reports with run history and screenshots.
 
-```
-OpenLibrary-Automation-Framework/
-├── pages/                      # Page Object Model classes
+## Tech Stack
+
+- Python 3.12+
+- Playwright (async API)
+- Pytest + pytest-asyncio
+- Allure (allure-pytest)
+- python-dotenv
+- PyYAML
+
+## Project Structure
+
+```text
+OpenLibrary-Automation/
+├── config/
 │   ├── __init__.py
-│   ├── base_page.py           # Base class with common operations
-│   ├── search_page.py         # Search page interactions
-│   └── reading_list_page.py   # Reading list page interactions
-├── tests/                      # Test suite
-│   ├── __init__.py
-│   ├── conftest.py            # Pytest fixtures and configuration
-│   └── test_library_flow.py   # Framework test cases
-├── data/                       # Test data
-│   └── test_data.json         # Data-driven test inputs
-├── utils/                      # Helper utilities
-│   ├── __init__.py
-│   ├── performance_helper.py  # Performance measurement helper
-│   └── test_data_loader.py    # Test data loading utility
-├── requirements.txt           # Python dependencies
-├── pyproject.toml            # Project configuration
-├── pytest.ini                # Pytest configuration
-├── .env.example              # Environment variables template
-└── README.md                 # This file
+│   ├── loader.py
+│   ├── config.json
+│   └── config.yaml
+├── data/
+│   ├── test_data.json
+│   ├── test_data.yaml
+│   └── test_data.csv
+├── pages/
+│   ├── base_page.py
+│   ├── login_page.py
+│   ├── home_page.py
+│   ├── book_details_page.py
+│   └── user_books_page.py
+├── tests/
+│   └── test_openlibrary.py
+├── utils/
+│   ├── data_loader.py
+│   ├── reading_list_utils.py
+│   ├── search_utils.py
+│   ├── helpers.py
+│   └── performance/
+│       ├── __init__.py
+│       ├── performance_helper.py
+│       ├── performance_repository.py
+│       ├── performance_html_report.py
+│       └── report_opener.py
+├── templates/
+│   └── performance_report_template.html
+├── screenshots/
+├── main.py
+├── requirements.txt
+└── pytest.ini
 ```
 
-## Key Components
+## Architecture
 
-### Pages Package
-- **BasePage**: Base class providing common page operations (click, fill, wait, etc.)
-- **SearchPage**: Handles search functionality, result extraction, and filtering
-- **ReadingListPage**: Manages reading list operations (add, remove, display items)
+### 1) Page Object Model (POM)
 
-### Utils Package
-- **PerformanceHelper**: Measures page load time, first paint, and other performance metrics
-- **TestDataLoader**: Loads and manages test data from JSON files for data-driven testing
+- `BasePage` encapsulates shared UI actions (`goto`, `click`, `fill_input`, `get_text`).
+- Each page class encapsulates selectors and DOM interactions for one screen.
+- Business rules are kept outside page classes where possible.
 
-### Test Suite
-- Parametrized tests for different search queries and filters
-- Performance assertions with configurable thresholds
-- Data-driven test cases from external JSON
-- Setup/teardown fixtures for async operations
-- Allure report generation support
+### 2) Business Logic Layer
 
-## Features
+- `utils/search_utils.py` handles search/filter logic by year and limit.
+- `utils/reading_list_utils.py` handles reading list assertions.
 
-✅ **Asynchronous Programming**: All tests run with asyncio support for concurrent execution
-✅ **Data-Driven Testing**: External test data in JSON format with multiple test cases
-✅ **Performance Monitoring**: Measure and report page load metrics
-✅ **Allure Reports**: Rich test reporting with screenshots and metrics
-✅ **Type Hints**: Full type annotations for IDE support and code clarity
-✅ **OOP & SRP**: Clean architecture following industry best practices
-✅ **Fixtures**: Pytest fixtures for browser, page, and context setup
+### 3) Performance Layer (SRP Split)
 
-## Quick Start
+- `performance_helper.py`: collect runtime performance metrics in memory.
+- `performance_repository.py`: persist/read performance JSON history.
+- `performance_html_report.py`: render HTML from report data + template.
+- `report_opener.py`: open generated report file.
 
-### Prerequisites
-- Python 3.9+
-- pip
+### 4) Orchestration Layer
 
-### Installation
-
-1. Clone/create the project directory
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Install Playwright browsers:
-```bash
-playwright install
-```
-
-4. Configure environment variables:
-```bash
-cp .env.example .env
-```
-
-### Running Tests
-
-Run all tests:
-```bash
-pytest
-```
-
-Run with verbose output:
-```bash
-pytest -v
-```
-
-Run specific test file:
-```bash
-pytest tests/test_library_flow.py
-```
-
-Run async tests only:
-```bash
-pytest -m asyncio
-```
-
-Run specific markers:
-```bash
-pytest -m smoke
-pytest -m performance
-```
-
-### Generating Allure Reports
-
-Generate report:
-```bash
-allure generate --clean -o allure-report
-```
-
-Open report:
-```bash
-allure open allure-report
-```
-
-## Test Data Format
-
-Test data is stored in `data/test_data.json` with the following structure:
-
-```json
-{
-  "search_tests": [
-    {
-      "test_id": "search_001",
-      "query": "Dune",
-      "max_year": 1980,
-      "limit": 5,
-      "expected_min_results": 1
-    }
-  ]
-}
-```
+- `main.py` coordinates end-to-end flow, collects run context, and triggers report generation.
 
 ## Configuration
 
-### pytest.ini
-- Async test mode configuration
-- Test discovery patterns
-- Custom markers
-- Allure report path
+Configuration is loaded through `config/loader.py` with support for JSON/YAML/CSV.
 
-### pyproject.toml
-- Project metadata
-- Dependencies management
-- Tool configurations (black, isort, mypy)
-- Python version requirements
+Important keys:
 
-### .env Variables
-- BASE_URL: OpenLibrary base URL
-- HEADLESS: Headless browser mode
-- TIMEOUT: Action timeout in milliseconds
-- Performance thresholds
+- `BASE_URL`
+- `HEADLESS`
+- `BROWSER`
+- `TIMEOUT`
+- `TEST_DATA_PATH`
+- `PERFORMANCE_THRESHOLDS`
 
-## Performance Measurement
+Example (`config/config.json`):
 
-The `PerformanceHelper` class provides:
-- **First Paint Time**: Time until first visual change
-- **Page Load Time**: Complete page load duration
-- **Custom Metrics**: Record any performance metric
-- **JSON Reporting**: Save metrics to `performance_report.json`
-- **Threshold Assertions**: Verify metrics meet requirements
+```json
+{
+	"BASE_URL": "https://openlibrary.org",
+	"HEADLESS": false,
+	"BROWSER": "chromium",
+	"TIMEOUT": 30000,
+	"TEST_DATA_PATH": "data/test_data.json",
+	"PERFORMANCE_THRESHOLDS": {
+		"search_page_first_paint_ms": 3000,
+		"search_page_dom_content_loaded_ms": 3000,
+		"search_page_load_time_ms": 3000,
+		"book_page_first_paint_ms": 2500,
+		"book_page_dom_content_loaded_ms": 2500,
+		"book_page_load_time_ms": 2500,
+		"reading_list_first_paint_ms": 2000,
+		"reading_list_dom_content_loaded_ms": 2000,
+		"reading_list_load_time_ms": 2000
+	}
+}
+```
 
-## Implementation Notes
+Sensitive values (`EMAIL_INPUT`, `USERNAME_INPUT`, `PASSWORD_INPUT`) should come from environment variables (`.env`) and not be hardcoded.
 
-This is a **scaffold/skeleton** project with:
-- ✅ Complete folder structure
-- ✅ Class and method signatures
-- ✅ Type hints and documentation
-- ✅ Configuration files (pytest, pyproject, requirements)
-- ✅ Test data template
-- ❌ Actual method implementations (to be added)
+## Setup
 
-## Next Steps
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+playwright install
+```
 
-1. Implement methods in `BasePage` for Playwright interactions
-2. Implement page-specific methods in `SearchPage` and `ReadingListPage`
-3. Implement `PerformanceHelper` metrics collection
-4. Implement `TestDataLoader` JSON parsing
-5. Write actual test logic in `test_library_flow.py`
-6. Configure Allure report parameters
-7. Run tests and generate reports
+## Execution
 
-## Best Practices
+### Run Main E2E Flow
 
-- Use `async`/`await` for all async operations
-- Follow naming conventions (test_* for test functions)
-- Add docstrings to all classes and methods
-- Use type hints throughout
-- Keep page locators as class constants
-- Use markers for test categorization
-- Load test data once per test session
+```bash
+python main.py
+```
 
-## Troubleshooting
+Outputs:
 
-### Async Issues
-- Ensure pytest-asyncio is installed
-- Check `conftest.py` event loop configuration
-- Verify `asyncio_mode = auto` in pytest.ini
+- `performance_report.json` (historical run data)
+- `performance_report.html` (human-friendly report)
+- `screenshots/` (captured per-book screenshots)
 
-### Element Not Found
-- Check locators in page classes
-- Use explicit waits in `wait_for_element()`
-- Verify page is fully loaded
+### Run Pytest + Allure
 
-### Performance Metrics Not Collected
-- Ensure page navigation completes
-- Check browser supports performance API
-- Verify metrics are recorded in helper
+```bash
+pytest tests/ --alluredir=allure-results -v
+allure serve allure-results
+```
 
-## License
+## Reports
 
-MIT
+### Performance JSON Report
 
-## Author
+- Stores all historical runs.
+- Includes run context (query, max year, limit, expected/actual counts, URLs, screenshots).
+- Includes per-metric values and threshold mapping.
 
-QA Automation Team
+### Performance HTML Report
+
+- Rendered from `templates/performance_report_template.html`.
+- Shows run history, context, metric table, threshold status, and screenshot gallery.
+- Can be auto-opened at end of `main.py` execution.
+
+### Allure Report
+
+- Structured test steps.
+- Attachments for URLs, counts, and performance data.
+- Suitable for QA review and test evidence.
+
+## Known Limitations
+
+1. External website dependency.
+The automation depends on OpenLibrary DOM behavior and network stability. UI changes may break selectors.
+
+2. Selector fragility.
+Even with improved selectors, some flows rely on dynamic dropdown behavior that may change over time.
+
+3. Timing sensitivity.
+Some operations still require waits for dynamic content and can be impacted by slow network/server response.
+
+4. Performance metrics precision.
+Metrics come from browser timing APIs and can vary across environments, machines, and browser versions.
+
+5. Test data validity.
+Search behavior and result counts can change over time due to live catalog updates on OpenLibrary.
+
+## Improvement Ideas
+
+1. Add retry wrappers for flaky UI actions.
+2. Add contract checks for critical selectors before full execution.
+3. Add CI pipeline (lint, tests, report artifacts).
+4. Add richer trend charts in HTML report.
+5. Add unit tests for performance/reporting utilities.
