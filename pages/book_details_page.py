@@ -3,7 +3,7 @@ import random
 
 from pages.base_page import BasePage
 from utils.helpers import take_screenshot
-from utils.performance_helper import PerformanceHelper
+from utils.performance.performance_helper import PerformanceHelper
 
 class BookDetailsPage(BasePage):
 

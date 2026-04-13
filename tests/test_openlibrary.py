@@ -18,7 +18,8 @@ from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from pages.user_books_page import UserBooksPage
 from utils.data_loader import load_test_data
-from utils.performance_helper import PerformanceHelper
+from utils.performance.performance_repository import PerformanceRepository
+from utils.performance.performance_helper import PerformanceHelper
 from utils.reading_list_utils import assert_reading_lists_count
 from utils.search_utils import search_books_by_title_under_year
 
@@ -128,9 +129,11 @@ async def test_add_books_to_reading_list(browser_context, perf_helper, test_data
 
     # ── 6. Attach performance report ─────────────────────────────────────────
     with allure.step("Save and attach performance report"):
-        await perf_helper.save_performance_report(test_name="test_add_books_to_reading_list")
+        performance_repo = PerformanceRepository()
+        run_entry = perf_helper.build_run_entry(test_name="test_add_books_to_reading_list")
+        performance_repo.append_run(run_entry, perf_helper.thresholds)
 
-        with open(perf_helper.report_path, "r", encoding="utf-8") as f:
+        with open(performance_repo.report_path, "r", encoding="utf-8") as f:
             report_json = f.read()
 
         allure.attach(

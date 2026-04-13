@@ -11,7 +11,10 @@ from pages.user_books_page import UserBooksPage
 from utils.data_loader import load_test_data
 from utils.search_utils import search_books_by_title_under_year
 from utils.reading_list_utils import assert_reading_lists_count
-from utils.performance_helper import PerformanceHelper
+from utils.performance.performance_repository import PerformanceRepository
+from utils.performance.performance_html_report import PerformanceHtmlReportBuilder
+from utils.performance.report_opener import ReportOpener
+from utils.performance.performance_helper import PerformanceHelper
 from config import Config
 
 # Setup Logging
@@ -40,6 +43,9 @@ def _collect_latest_screenshots_for_urls(urls: list[str]) -> list[str]:
 
 async def run_test():
     perf_helper = PerformanceHelper()
+    performance_repo = PerformanceRepository()
+    html_report_builder = PerformanceHtmlReportBuilder()
+    report_opener = ReportOpener()
     
     async with async_playwright() as p:
         # 1. Setup Browser
@@ -115,10 +121,11 @@ async def run_test():
             logger.error(f"An error occurred during execution: {e}")
         
         finally:
-            await perf_helper.save_performance_report()
+            run_entry = perf_helper.build_run_entry(test_name="automation_test")
+            report_data = performance_repo.append_run(run_entry, perf_helper.thresholds)
             try:
-                html_path = perf_helper.generate_html_report()
-                perf_helper.open_html_report(html_path)
+                html_path = html_report_builder.generate_from_report_data(report_data)
+                report_opener.open_file(html_path)
             except Exception as report_error:
                 logger.warning("Could not open HTML report automatically: %s", report_error)
             logger.info("Closing browser.")
