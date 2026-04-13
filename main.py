@@ -1,7 +1,6 @@
 # main.py
 import asyncio
 import logging
-from pathlib import Path
 from playwright.async_api import async_playwright
 
 # Imports from your pages
@@ -23,23 +22,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("MainRunner")
-
-
-def _collect_latest_screenshots_for_urls(urls: list[str]) -> list[str]:
-    """Collect the latest screenshot path for each added book URL."""
-    screenshots_dir = Path("screenshots")
-    if not screenshots_dir.exists():
-        return []
-
-    collected: list[str] = []
-    for url in urls:
-        book_id = url.rstrip("/").split("/")[-1]
-        matches = list(screenshots_dir.glob(f"*_book_{book_id}.png"))
-        if not matches:
-            continue
-        latest = max(matches, key=lambda p: p.stat().st_mtime)
-        collected.append(str(latest))
-    return collected
 
 async def run_test():
     perf_helper = PerformanceHelper()
@@ -94,12 +76,16 @@ async def run_test():
             # We already have book_urls. Now we visit each one.
             from pages.book_details_page import BookDetailsPage
             details_page = BookDetailsPage(page)
-            
-            await details_page.add_books_to_reading_list(book_urls)                
+
+            screenshots: list[str] = []
+            for url in book_urls:
+                screenshots.extend(await details_page.add_books_to_reading_list([url]))
+                await perf_helper.measure_page_performance(page, "book_page")
+
             perf_helper.set_run_context(
                 added_book_urls=book_urls,
                 added_books_count=len(book_urls),
-                screenshots=_collect_latest_screenshots_for_urls(book_urls),
+                screenshots=screenshots,
             )
 
             # 5. Assertion Phase (Task #3)

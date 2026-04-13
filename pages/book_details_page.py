@@ -1,29 +1,32 @@
 # pages/book_details_page.py
 import random
+from typing import List
 
 from pages.base_page import BasePage
 from utils.helpers import take_screenshot
-from utils.performance.performance_helper import PerformanceHelper
 
 class BookDetailsPage(BasePage):
 
     BOOK_BUTTON = "button.book-progress-btn"
     DROPDOWN_TRIGGER = "a.generic-dropper__dropclick"
-    READ_STATUS_ITEM = "div.read-statuses button.nostyle-btn"
+    READ_STATUS_VISIBLE_ITEM = "div.read-statuses button.nostyle-btn:not(.hidden)"
+    ALLOWED_STATUSES = {"Want to Read", "Already Read"}
 
-    async def add_books_to_reading_list(self, urls: list) -> None:
-        statuses = ["Want to Read", "Already Read"]
+    async def _choose_random_status(self) -> str:
+        """Pick a random allowed status from currently visible dropdown options."""
+        visible_buttons = self.page.locator(self.READ_STATUS_VISIBLE_ITEM)
+        labels = [text.strip() for text in await visible_buttons.all_inner_texts()]
+        allowed_labels = [label for label in labels if label in self.ALLOWED_STATUSES]
+        if not allowed_labels:
+            raise RuntimeError("No allowed reading statuses available in dropdown")
+        return random.choice(allowed_labels)
+
+    async def add_books_to_reading_list(self, urls: list) -> List[str]:
+        screenshot_paths: List[str] = []
 
         for url in urls:
-            chosen = random.choice(statuses)
-            self.logger.info(f"Choosing status: {chosen}")
-
             await self.goto(url)
             self.logger.info(f"Opened: {url}")
-
-            # Measure performance if helper is available
-            if PerformanceHelper.current_instance:
-                await PerformanceHelper.current_instance.measure_page_performance(self.page, "book_page")
 
             try:
                 btn = self.page.locator(self.BOOK_BUTTON).first
@@ -33,12 +36,12 @@ class BookDetailsPage(BasePage):
                 dropdown = self.page.locator(self.DROPDOWN_TRIGGER).first
                 await dropdown.wait_for(state="visible", timeout=10000)
                 await dropdown.click()
-                await self.page.wait_for_timeout(500)  # דרופדאון צריך זמן להיפתח
+                await self.page.wait_for_timeout(300)
 
-                status_button = self.page.locator(f"{self.READ_STATUS_ITEM}:has-text(\"{chosen}\")").first
-                
-                # Remove hidden class בדרך הישירה
-                await status_button.evaluate("el => el.classList.remove('hidden')")
+                chosen = await self._choose_random_status()
+                self.logger.info(f"Choosing status: {chosen}")
+
+                status_button = self.page.locator(f"{self.READ_STATUS_VISIBLE_ITEM}:has-text(\"{chosen}\")").first
                 await status_button.click()
 
                 await self.page.wait_for_function(
@@ -53,9 +56,13 @@ class BookDetailsPage(BasePage):
                 self.logger.info(f"Button state after choosing status: {text}")
 
                 book_id = url.split("/")[-1]
-                await take_screenshot(self.page, f"book_{book_id}")
+                screenshot_path = await take_screenshot(self.page, f"book_{book_id}")
+                if screenshot_path:
+                    screenshot_paths.append(screenshot_path)
                 self.logger.info(f"Finished interaction for: {url}")
 
             except Exception as e:
                 self.logger.error(f"Failed to update reading status: {e}")
                 raise
+
+        return screenshot_paths
