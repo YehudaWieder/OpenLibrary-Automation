@@ -21,8 +21,13 @@ class PerformanceHtmlReportBuilder:
 
     def generate_from_report_data(self, report_data: Dict[str, object]) -> str:
         runs = report_data.get("runs", []) if isinstance(report_data.get("runs"), list) else []
-        total_metrics = sum(len(run.get("metrics", [])) for run in runs if isinstance(run, dict))
-        run_sections = [self._render_run_section(run) for run in reversed(runs) if isinstance(run, dict)]
+        valid_runs = [r for r in runs if isinstance(r, dict)]
+        total_metrics = sum(len(run.get("metrics", [])) for run in valid_runs)
+        reversed_runs = list(reversed(valid_runs))
+        run_sections = [
+            self._render_run_section(run, i + 1)
+            for i, run in enumerate(reversed_runs)
+        ]
 
         if not self.template_path.exists():
             raise FileNotFoundError(f"HTML template not found: {self.template_path}")
@@ -43,65 +48,103 @@ class PerformanceHtmlReportBuilder:
         logger.info("HTML report generated at %s", self.html_output_path)
         return str(self.html_output_path)
 
-    def _render_run_section(self, run: Dict[str, object]) -> str:
+    def _render_run_section(self, run: Dict[str, object], run_num: int) -> str:
         context = run.get("context", {}) if isinstance(run.get("context"), dict) else {}
         metrics = run.get("metrics", []) if isinstance(run.get("metrics"), list) else []
         thresholds = run.get("thresholds", {}) if isinstance(run.get("thresholds"), dict) else {}
         screenshots = context.get("screenshots", []) if isinstance(context.get("screenshots"), list) else []
 
-        context_rows = "".join(
-            f"<tr><th>{html.escape(str(key))}</th><td>{html.escape(str(value))}</td></tr>"
-            for key, value in context.items()
-            if key != "screenshots"
-        ) or "<tr><td colspan='2'>No context</td></tr>"
+        # Context chips
+        ctx_items = "".join(
+            f"<div class='ctx-item'>"
+            f"<div class='ctx-key'>{html.escape(str(k))}</div>"
+            f"<div class='ctx-val'>{html.escape(str(v))}</div>"
+            f"</div>"
+            for k, v in context.items()
+            if k != "screenshots"
+        ) or "<div class='ctx-item'><div class='ctx-val' style='color:#94a3b8'>No context</div></div>"
 
-        metric_rows = []
+        # Metric rows with progress bars
+        metric_rows: List[str] = []
         for metric in metrics:
             if not isinstance(metric, dict):
                 continue
             name = metric.get("metric_name", "")
             value = metric.get("value", "")
             threshold = thresholds.get(name)
+
             if isinstance(value, (int, float)) and isinstance(threshold, (int, float)):
                 status = "OK" if value <= threshold else "EXCEEDED"
+                threshold_display = str(threshold)
+                data_attrs = f"data-value='{value}' data-threshold='{threshold}'"
             else:
                 status = "N/A"
+                threshold_display = str(threshold) if threshold is not None else "—"
+                data_attrs = ""
+
             metric_rows.append(
-                f"<tr><td>{html.escape(str(name))}</td><td>{html.escape(str(value))}</td>"
-                f"<td>{html.escape(str(threshold))}</td><td>{status}</td></tr>"
+                f"<tr class='metric-row' {data_attrs}>"
+                f"<td><span class='metric-name'>{html.escape(str(name))}</span></td>"
+                f"<td><div class='metric-val-wrap'>"
+                f"<span class='metric-val'>{html.escape(str(value))}</span>"
+                f"<div class='metric-bar-track'><div class='metric-bar-fill'></div></div>"
+                f"</div></td>"
+                f"<td>{html.escape(threshold_display)}</td>"
+                f"<td class='status-cell'>{status}</td>"
+                f"</tr>"
             )
 
-        metric_rows_html = "".join(metric_rows) or "<tr><td colspan='4'>No metrics</td></tr>"
+        metric_rows_html = "".join(metric_rows) or (
+            "<tr><td colspan='4' style='text-align:center;color:#94a3b8;padding:18px 14px'>"
+            "No metrics recorded</td></tr>"
+        )
 
-        screenshot_cards = []
+        # Screenshot cards
+        screenshot_cards: List[str] = []
         for image_path in screenshots:
             rel = html.escape(str(Path(str(image_path))))
+            name_only = html.escape(Path(str(image_path)).name)
             screenshot_cards.append(
-                f"<div class='shot'><a href='{rel}' target='_blank'><img src='{rel}' alt='screenshot'></a><p>{rel}</p></div>"
+                f"<div class='shot'>"
+                f"<a href='{rel}' target='_blank'>"
+                f"<img src='{rel}' alt='screenshot' loading='lazy'>"
+                f"</a>"
+                f"<div class='shot-caption'>{name_only}</div>"
+                f"</div>"
             )
 
-        screenshot_html = "".join(screenshot_cards) or "<p>No screenshots found for this run.</p>"
+        screenshot_html = "".join(screenshot_cards) or (
+            "<p style='color:#94a3b8;font-size:0.84rem'>No screenshots for this run.</p>"
+        )
 
-        return """
-            <section class='run'>
-              <h2>Run {run_id} - {test_name}</h2>
-              <p><strong>Started:</strong> {started_at} | <strong>Finished:</strong> {finished_at}</p>
-              <h3>Run Context</h3>
-              <table>{context_rows}</table>
-              <h3>Performance Metrics</h3>
-              <table>
-                <tr><th>Metric</th><th>Value</th><th>Threshold</th><th>Status</th></tr>
-                {metric_rows}
-              </table>
-              <h3>Screenshots</h3>
-              <div class='shots'>{screenshot_cards}</div>
-            </section>
-        """.format(
-            run_id=html.escape(str(run.get("run_id", ""))),
-            test_name=html.escape(str(run.get("test_name", "automation_test"))),
-            started_at=html.escape(str(run.get("started_at", ""))),
-            finished_at=html.escape(str(run.get("finished_at", ""))),
-            context_rows=context_rows,
-            metric_rows=metric_rows_html,
-            screenshot_cards=screenshot_html,
+        return (
+            f"<article class='run'>"
+            f"<div class='run-header'>"
+            f"<div class='run-badge'>#{run_num}</div>"
+            f"<div class='run-meta'>"
+            f"<div class='run-title'>{html.escape(str(run.get('test_name', 'automation_test')))}</div>"
+            f"<div class='run-ts'>"
+            f"<span>&#9654; {html.escape(str(run.get('started_at', '')))}</span>"
+            f"<span>&#9632; {html.escape(str(run.get('finished_at', '')))}</span>"
+            f"</div>"
+            f"</div>"
+            f"<div class='run-pills'></div>"
+            f"<div class='run-toggle'>&#9660;</div>"
+            f"</div>"
+            f"<div class='run-body'>"
+            f"<div class='section-label'>Context</div>"
+            f"<div class='ctx-grid'>{ctx_items}</div>"
+            f"<div class='section-label'>Performance Metrics</div>"
+            f"<div class='metrics-wrap'>"
+            f"<table>"
+            f"<thead><tr>"
+            f"<th>Metric</th><th>Value (ms)</th><th>Threshold</th><th>Status</th>"
+            f"</tr></thead>"
+            f"<tbody>{metric_rows_html}</tbody>"
+            f"</table>"
+            f"</div>"
+            f"<div class='section-label'>Screenshots</div>"
+            f"<div class='shots'>{screenshot_html}</div>"
+            f"</div>"
+            f"</article>"
         )
