@@ -1,11 +1,13 @@
 """Performance measurement helper for automation tests."""
 
 import json
-import time
+import logging
 from typing import Dict, Optional
 from datetime import datetime
-from pathlib import Path
 from playwright.async_api import Page
+from config import Config
+
+logger = logging.getLogger(__name__)
 
 
 class PerformanceHelper:
@@ -13,8 +15,10 @@ class PerformanceHelper:
     Helper class for measuring and reporting page performance metrics.
     
     Implements Single Responsibility Principle - handles performance measurement only.
-    Measures metrics like first paint and load time.
+    Measures metrics like first paint, DOM content loaded, and load time.
     """
+
+    current_instance: Optional['PerformanceHelper'] = None
 
     def __init__(self, report_path: str = "performance_report.json") -> None:
         """
@@ -24,21 +28,12 @@ class PerformanceHelper:
             report_path: Path to save performance report
         """
         self.report_path: str = report_path
-        self.metrics: Dict[str, float] = {}
         self.test_results: list = []
-
-    async def measure_page_load_time(self, page: Page, url: str) -> Dict[str, float]:
-        """
-        Measure page load time and related metrics.
-        
-        Args:
-            page: Playwright page instance
-            url: URL to navigate to
-            
-        Returns:
-            Dictionary with load time metrics (first_paint_ms, load_time_ms)
-        """
-        pass
+        self.thresholds: Dict[str, float] = Config.PERFORMANCE_THRESHOLDS
+        if not isinstance(self.thresholds, dict):
+            logger.error(f"Invalid thresholds type: {type(self.thresholds)}, value: {self.thresholds}, using empty dict")
+            self.thresholds = {}
+        PerformanceHelper.current_instance = self
 
     async def get_first_paint_time(self, page: Page) -> float:
         """
@@ -50,9 +45,28 @@ class PerformanceHelper:
         Returns:
             First paint time in milliseconds
         """
-        pass
+        return await page.evaluate("""() => {
+            const entries = performance.getEntriesByType('paint');
+            const firstPaint = entries.find(entry => entry.name === 'first-paint');
+            return firstPaint ? firstPaint.startTime : 0;
+        }""")
 
-    async def get_page_load_time(self, page: Page) -> float:
+    async def get_dom_content_loaded_time(self, page: Page) -> float:
+        """
+        Get DOM content loaded time from performance API.
+        
+        Args:
+            page: Playwright page instance
+            
+        Returns:
+            DOM content loaded time in milliseconds
+        """
+        return await page.evaluate("""() => {
+            const timing = performance.timing;
+            return timing.domContentLoadedEventEnd - timing.navigationStart;
+        }""")
+
+    async def get_load_time(self, page: Page) -> float:
         """
         Get page load time from performance API.
         
@@ -62,19 +76,38 @@ class PerformanceHelper:
         Returns:
             Page load time in milliseconds
         """
-        pass
+        return await page.evaluate("""() => {
+            const timing = performance.timing;
+            return timing.loadEventEnd - timing.navigationStart;
+        }""")
 
-    async def get_all_performance_metrics(self, page: Page) -> Dict[str, float]:
+    async def measure_page_performance(self, page: Page, page_type: str) -> Dict[str, float]:
         """
-        Get comprehensive performance metrics.
+        Measure all performance metrics for a page.
         
         Args:
             page: Playwright page instance
+            page_type: Type of page (search, book, reading_list)
             
         Returns:
-            Dictionary with all available performance metrics
+            Dictionary with performance metrics
         """
-        pass
+        first_paint_ms = await self.get_first_paint_time(page)
+        dom_content_loaded_ms = await self.get_dom_content_loaded_time(page)
+        load_time_ms = await self.get_load_time(page)
+        
+        metrics = {
+            'first_paint_ms': first_paint_ms,
+            'dom_content_loaded_ms': dom_content_loaded_ms,
+            'load_time_ms': load_time_ms
+        }
+        
+        # Record metrics
+        for metric_name, value in metrics.items():
+            full_metric_name = f"{page_type}_{metric_name}"
+            self.record_test_metric(page_type, full_metric_name, value)
+        
+        return metrics
 
     def record_test_metric(
         self, 
@@ -87,10 +120,23 @@ class PerformanceHelper:
         
         Args:
             test_name: Name of the test
-            metric_name: Name of the metric (e.g., 'load_time_ms')
+            metric_name: Name of the metric
             value: Metric value
         """
-        pass
+        self.test_results.append({
+            "test_name": test_name,
+            "metric_name": metric_name,
+            "value": value,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        # Check threshold and log warning if exceeded
+        if (isinstance(self.thresholds, dict) and 
+            metric_name in self.thresholds and 
+            isinstance(value, (int, float)) and 
+            isinstance(self.thresholds[metric_name], (int, float)) and
+            value > self.thresholds[metric_name]):
+            logger.warning(f"Performance threshold exceeded for {metric_name}: {value:.2f}ms > {self.thresholds[metric_name]}ms")
 
     async def save_performance_report(self, test_name: Optional[str] = None) -> None:
         """
@@ -99,36 +145,29 @@ class PerformanceHelper:
         Args:
             test_name: Optional specific test name to include in report
         """
-        pass
+        report_path = self.report_path
+        existing_data = {}
 
-    def get_performance_report(self) -> Dict:
-        """
-        Get current performance report data.
-        
-        Returns:
-            Dictionary containing performance report
-        """
-        pass
+        try:
+            with open(report_path, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+        except FileNotFoundError:
+            existing_data = {}
+        except json.JSONDecodeError:
+            logger.warning(f"Existing report file {report_path} is invalid JSON. Overwriting with new report.")
+            existing_data = {}
 
-    def clear_metrics(self) -> None:
-        """Clear all recorded metrics."""
-        pass
+        previous_metrics = existing_data.get("metrics") if isinstance(existing_data.get("metrics"), list) else []
+        combined_metrics = previous_metrics + self.test_results
 
-    async def assert_performance_threshold(
-        self, 
-        metric_name: str, 
-        actual_value: float, 
-        threshold_ms: int
-    ) -> bool:
-        """
-        Assert that a performance metric is within threshold.
-        
-        Args:
-            metric_name: Name of the metric to check
-            actual_value: Actual metric value
-            threshold_ms: Threshold in milliseconds
-            
-        Returns:
-            True if within threshold, False otherwise
-        """
-        pass
+        report_data = {
+            "test_run_timestamp": datetime.now().isoformat(),
+            "test_name": test_name or existing_data.get("test_name", "automation_test"),
+            "thresholds": self.thresholds,
+            "metrics": combined_metrics
+        }
+
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"Performance report saved to {report_path} (appended %d metrics)", len(self.test_results))

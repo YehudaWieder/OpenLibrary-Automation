@@ -10,6 +10,7 @@ from pages.user_books_page import UserBooksPage
 from utils.data_loader import load_test_data
 from utils.search_utils import search_books_by_title_under_year
 from utils.reading_list_utils import assert_reading_lists_count
+from utils.performance_helper import PerformanceHelper
 from config import Config
 
 # Setup Logging
@@ -20,6 +21,8 @@ logging.basicConfig(
 logger = logging.getLogger("MainRunner")
 
 async def run_test():
+    perf_helper = PerformanceHelper()
+    
     async with async_playwright() as p:
         # 1. Setup Browser
         logger.info(f"Launching {Config.BROWSER}...")
@@ -52,6 +55,7 @@ async def run_test():
                 max_year=max_year,
                 limit=limit,
             )
+            await perf_helper.measure_page_performance(page, "search_page")
 
             if not book_urls:
                 logger.error("No books found matching criteria. Stopping test.")
@@ -67,6 +71,7 @@ async def run_test():
             # 5. Assertion Phase (Task #3)
             user_books_page = UserBooksPage(page)
             await user_books_page.open()
+            await perf_helper.measure_page_performance(page, "reading_list")
             actual_count = await assert_reading_lists_count(
                 user_books_page=user_books_page,
                 expected_count=len(book_urls),
@@ -78,6 +83,7 @@ async def run_test():
             logger.error(f"An error occurred during execution: {e}")
         
         finally:
+            await perf_helper.save_performance_report()
             logger.info("Closing browser.")
             await browser.close()
 

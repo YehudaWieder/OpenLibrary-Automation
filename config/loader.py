@@ -4,7 +4,7 @@ import csv
 import json
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union
 
@@ -24,6 +24,11 @@ DEFAULTS: Dict[str, Any] = {
     "EMAIL_INPUT": None,
     "USERNAME_INPUT": None,
     "PASSWORD_INPUT": None,
+    "PERFORMANCE_THRESHOLDS": {
+        "search_page_load_time_ms": 3000,
+        "book_page_load_time_ms": 2500,
+        "reading_list_load_time_ms": 2000
+    },
 }
 
 SENSITIVE_KEYS = {"EMAIL_INPUT", "USERNAME_INPUT", "PASSWORD_INPUT"}
@@ -193,6 +198,7 @@ class Config:
     EMAIL_INPUT: Optional[str] = DEFAULTS["EMAIL_INPUT"]
     USERNAME_INPUT: Optional[str] = DEFAULTS["USERNAME_INPUT"]
     PASSWORD_INPUT: Optional[str] = DEFAULTS["PASSWORD_INPUT"]
+    PERFORMANCE_THRESHOLDS: Dict[str, int] = field(default_factory=lambda: DEFAULTS["PERFORMANCE_THRESHOLDS"].copy())
 
     @classmethod
     def load(cls) -> "Config":
@@ -209,6 +215,7 @@ class Config:
             EMAIL_INPUT=merged["EMAIL_INPUT"],
             USERNAME_INPUT=merged["USERNAME_INPUT"],
             PASSWORD_INPUT=merged["PASSWORD_INPUT"],
+            PERFORMANCE_THRESHOLDS=merged["PERFORMANCE_THRESHOLDS"],
         )
 
 

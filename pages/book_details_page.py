@@ -3,6 +3,7 @@ import random
 
 from pages.base_page import BasePage
 from utils.helpers import take_screenshot
+from utils.performance_helper import PerformanceHelper
 
 class BookDetailsPage(BasePage):
 
@@ -19,6 +20,10 @@ class BookDetailsPage(BasePage):
 
             await self.goto(url)
             self.logger.info(f"Opened: {url}")
+
+            # Measure performance if helper is available
+            if PerformanceHelper.current_instance:
+                await PerformanceHelper.current_instance.measure_page_performance(self.page, "book_page")
 
             try:
                 btn = self.page.locator(self.BOOK_BUTTON).first

@@ -3,5 +3,10 @@
   "HEADLESS": false,
   "BROWSER": "chromium",
   "TIMEOUT": 30000,
-  "TEST_DATA_PATH": "data/test_data.json"
+  "TEST_DATA_PATH": "data/test_data.json",
+  "PERFORMANCE_THRESHOLDS": {
+    "search_page_load_time_ms": 3000,
+    "book_page_load_time_ms": 2500,
+    "reading_list_load_time_ms": 2000
+  }
 }
