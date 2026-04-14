@@ -4,7 +4,7 @@ import logging
 from playwright.async_api import async_playwright
 
 # Imports from your pages
-from pages.login_page import LoginPage
+from pages.login_page import LoginPage, LoginFailedError
 from pages.home_page import HomePage
 from pages.user_books_page import UserBooksPage
 from utils.data_loader import load_test_data
@@ -28,6 +28,7 @@ async def run_test():
     performance_repo = PerformanceRepository()
     html_report_builder = PerformanceHtmlReportBuilder()
     report_opener = ReportOpener()
+    should_persist_report = False
     
     async with async_playwright() as p:
         # Setup Browser
@@ -43,6 +44,7 @@ async def run_test():
             login_page = LoginPage(page)
             await login_page.open_login()
             await login_page.login(Config.EMAIL_INPUT, Config.PASSWORD_INPUT)
+            should_persist_report = True
 
             # Clear existing reading lists to prevent toggle issues
             user_books_page = UserBooksPage(page)
@@ -103,17 +105,23 @@ async def run_test():
 
             logger.info("TEST PASSED: Books successfully added to reading list.")
 
+        except LoginFailedError as e:
+            logger.error("Login failed, skipping performance collection and report persistence: %s", e)
+
         except Exception as e:
             logger.error(f"An error occurred during execution: {e}")
         
         finally:
-            run_entry = perf_helper.build_run_entry(test_name="automation_test")
-            report_data = performance_repo.append_run(run_entry, perf_helper.thresholds)
-            try:
-                html_path = html_report_builder.generate_from_report_data(report_data)
-                report_opener.open_file(html_path)
-            except Exception as report_error:
-                logger.warning("Could not open HTML report automatically: %s", report_error)
+            if should_persist_report:
+                run_entry = perf_helper.build_run_entry(test_name="automation_test")
+                report_data = performance_repo.append_run(run_entry, perf_helper.thresholds)
+                try:
+                    html_path = html_report_builder.generate_from_report_data(report_data)
+                    report_opener.open_file(html_path)
+                except Exception as report_error:
+                    logger.warning("Could not open HTML report automatically: %s", report_error)
+            else:
+                logger.info("Skipping performance report persistence because login did not succeed")
             logger.info("Closing browser.")
             await browser.close()
 

@@ -10,6 +10,9 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
+ENV_FILE_PATH = Path(".env")
+REQUIRED_AUTH_ENV_KEYS: tuple[str, ...] = ("EMAIL_INPUT", "PASSWORD_INPUT")
+
 try:
     import yaml  # type: ignore
 except ImportError:  # pragma: no cover
@@ -200,6 +203,23 @@ def _merge_values(config_values: Dict[str, Any], env_values: Dict[str, Optional[
     return merged
 
 
+def _require_env_auth_settings(env_values: Dict[str, Optional[str]]) -> None:
+    """Fail fast when mandatory authentication settings are missing from .env."""
+    if not ENV_FILE_PATH.exists():
+        raise RuntimeError(
+            "Missing required .env file in project root. "
+            f"Create {ENV_FILE_PATH} with keys: {', '.join(REQUIRED_AUTH_ENV_KEYS)}"
+        )
+
+    missing_keys = [key for key in REQUIRED_AUTH_ENV_KEYS if not (env_values.get(key) or "").strip()]
+    if missing_keys:
+        missing = ", ".join(missing_keys)
+        raise RuntimeError(
+            "Missing required authentication environment variables in .env: "
+            f"{missing}"
+        )
+
+
 @dataclass(frozen=True)
 class Config:
     BASE_URL: str = DEFAULTS["BASE_URL"]
@@ -217,6 +237,7 @@ class Config:
         config_file = _discover_config_file()
         config_data = load_config_file(config_file) if config_file else {}
         env_data = {key: os.getenv(key) for key in DEFAULTS}
+        _require_env_auth_settings(env_data)
         merged = _merge_values(config_data, env_data)
         return cls(
             BASE_URL=merged["BASE_URL"],
