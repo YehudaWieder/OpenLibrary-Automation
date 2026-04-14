@@ -17,8 +17,6 @@ class PerformanceHelper:
     in memory for the current run.
     """
 
-    current_instance: Optional['PerformanceHelper'] = None
-
     def __init__(self) -> None:
         """
         Initialize performance collector for current run.
@@ -30,7 +28,6 @@ class PerformanceHelper:
         if not isinstance(self.thresholds, dict):
             logger.error(f"Invalid thresholds type: {type(self.thresholds)}, value: {self.thresholds}, using empty dict")
             self.thresholds = {}
-        PerformanceHelper.current_instance = self
 
     def set_run_context(self, **kwargs: object) -> None:
         """Set arbitrary context values for the current run."""
