@@ -9,50 +9,17 @@ import json
 
 import allure
 import pytest
-import pytest_asyncio
-from playwright.async_api import async_playwright
 
 from config import Config
 from pages.book_details_page import BookDetailsPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from pages.user_books_page import UserBooksPage
-from utils.data_loader import load_test_data
 from utils.performance.performance_repository import PerformanceRepository
 from utils.performance.performance_helper import PerformanceHelper
 from utils.reading_list_utils import assert_reading_lists_count
 from utils.search_utils import search_books_by_title_under_year
 
-
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-@pytest_asyncio.fixture(scope="function")
-async def browser_context():
-    """Create a browser context for each test."""
-    async with async_playwright() as p:
-        launcher = getattr(p, Config.BROWSER)
-        browser = await launcher.launch(headless=Config.HEADLESS)
-        context = await browser.new_context()
-        page = await context.new_page()
-        yield page
-        await browser.close()
-
-
-@pytest.fixture(scope="function")
-def perf_helper():
-    return PerformanceHelper()
-
-
-@pytest.fixture(scope="function")
-def test_data():
-    return load_test_data(Config.TEST_DATA_PATH)
-
-
-# ---------------------------------------------------------------------------
-# Test
-# ---------------------------------------------------------------------------
 
 @allure.epic("OpenLibrary Automation")
 @allure.feature("Reading List Management")
