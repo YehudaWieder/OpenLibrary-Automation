@@ -25,7 +25,6 @@ DEFAULTS: Dict[str, Any] = {
     "TIMEOUT": 30000,
     "TEST_DATA_PATH": "data/test_data.json",
     "EMAIL_INPUT": None,
-    "USERNAME_INPUT": None,
     "PASSWORD_INPUT": None,
     "PERFORMANCE_THRESHOLDS": {
         "search_page_first_paint_ms": 3000,
@@ -40,7 +39,7 @@ DEFAULTS: Dict[str, Any] = {
     },
 }
 
-SENSITIVE_KEYS = {"EMAIL_INPUT", "USERNAME_INPUT", "PASSWORD_INPUT"}
+SENSITIVE_KEYS = {"EMAIL_INPUT", "PASSWORD_INPUT"}
 
 CONFIG_CANDIDATE_PRIORITY: List[str] = [
     ".json",
@@ -228,7 +227,6 @@ class Config:
     TIMEOUT: int = DEFAULTS["TIMEOUT"]
     TEST_DATA_PATH: str = DEFAULTS["TEST_DATA_PATH"]
     EMAIL_INPUT: Optional[str] = DEFAULTS["EMAIL_INPUT"]
-    USERNAME_INPUT: Optional[str] = DEFAULTS["USERNAME_INPUT"]
     PASSWORD_INPUT: Optional[str] = DEFAULTS["PASSWORD_INPUT"]
     PERFORMANCE_THRESHOLDS: Dict[str, int] = field(default_factory=lambda: DEFAULTS["PERFORMANCE_THRESHOLDS"].copy())
 
@@ -246,7 +244,6 @@ class Config:
             TIMEOUT=int(merged["TIMEOUT"]),
             TEST_DATA_PATH=str(merged["TEST_DATA_PATH"]),
             EMAIL_INPUT=merged["EMAIL_INPUT"],
-            USERNAME_INPUT=merged["USERNAME_INPUT"],
             PASSWORD_INPUT=merged["PASSWORD_INPUT"],
             PERFORMANCE_THRESHOLDS=merged["PERFORMANCE_THRESHOLDS"],
         )

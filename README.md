@@ -123,7 +123,7 @@ Example (`config/config.json`):
 }
 ```
 
-Sensitive values (`EMAIL_INPUT`, `USERNAME_INPUT`, `PASSWORD_INPUT`) should come from environment variables (`.env`) and not be hardcoded.
+Sensitive values (`EMAIL_INPUT`, `PASSWORD_INPUT`) should come from environment variables (`.env`) and not be hardcoded.
 
 ## Setup
 

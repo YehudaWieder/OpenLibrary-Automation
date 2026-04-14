@@ -1,5 +1,4 @@
 #pages/user_books_page.py
-from itertools import count
 import re
 from pages.base_page import BasePage
 from config import Config
@@ -13,7 +12,7 @@ class UserBooksPage(BasePage):
 
     async def open(self):
         """Navigate to the user's books overview page."""
-        await self.goto(f"{Config.BASE_URL}/people/{Config.USERNAME_INPUT}/books")
+        await self.goto(f"{Config.BASE_URL}/account/books")
         self.logger.info("Opened User Books overview page")
 
     async def _extract_count(self, locator: str) -> int:
