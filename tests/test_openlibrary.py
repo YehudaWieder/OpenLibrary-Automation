@@ -152,12 +152,8 @@ def _attach_performance_thresholds_status(perf_helper: PerformanceHelper) -> Non
         metric = entry["metric_name"]
         value = entry["value"]
         threshold = perf_helper.thresholds.get(metric)
-        if threshold is None:
-            status = "—"
-        elif isinstance(value, (int, float)) and value > threshold:
-            status = f"⚠ EXCEEDED ({value:.0f}ms > {threshold}ms)"
-        else:
-            status = f"✓ OK ({value:.0f}ms)"
+        status_name = entry.get("status") or perf_helper.classify_metric(value, threshold)[0]
+        status = perf_helper.format_metric_status(status_name, value, threshold)
         rows.append(f"{metric}: {status}")
 
     allure.attach(
