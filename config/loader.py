@@ -24,6 +24,7 @@ DEFAULTS: Dict[str, Any] = {
     "BROWSER": "chromium",
     "TIMEOUT": 30000,
     "TEST_DATA_PATH": "data/test_data.json",
+    "RANDOMIZE_READING_STATUS": False,
     "EMAIL_INPUT": None,
     "PASSWORD_INPUT": None,
     "PERFORMANCE_THRESHOLDS": {
@@ -226,6 +227,7 @@ class Config:
     BROWSER: str = DEFAULTS["BROWSER"]
     TIMEOUT: int = DEFAULTS["TIMEOUT"]
     TEST_DATA_PATH: str = DEFAULTS["TEST_DATA_PATH"]
+    RANDOMIZE_READING_STATUS: bool = DEFAULTS["RANDOMIZE_READING_STATUS"]
     EMAIL_INPUT: Optional[str] = DEFAULTS["EMAIL_INPUT"]
     PASSWORD_INPUT: Optional[str] = DEFAULTS["PASSWORD_INPUT"]
     PERFORMANCE_THRESHOLDS: Dict[str, int] = field(default_factory=lambda: DEFAULTS["PERFORMANCE_THRESHOLDS"].copy())
@@ -243,6 +245,7 @@ class Config:
             BROWSER=merged["BROWSER"],
             TIMEOUT=int(merged["TIMEOUT"]),
             TEST_DATA_PATH=str(merged["TEST_DATA_PATH"]),
+            RANDOMIZE_READING_STATUS=bool(merged["RANDOMIZE_READING_STATUS"]),
             EMAIL_INPUT=merged["EMAIL_INPUT"],
             PASSWORD_INPUT=merged["PASSWORD_INPUT"],
             PERFORMANCE_THRESHOLDS=merged["PERFORMANCE_THRESHOLDS"],

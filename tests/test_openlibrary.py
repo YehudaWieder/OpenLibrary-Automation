@@ -68,7 +68,10 @@ async def test_add_books_to_reading_list(browser_context, perf_helper, test_data
         details_page = BookDetailsPage(page)
         for i, url in enumerate(book_urls, start=1):
             with allure.step(f"Book {i}: {url}"):
-                await details_page.add_books_to_reading_list([url])
+                await details_page.add_books_to_reading_list(
+                    [url],
+                    randomize_status=Config.RANDOMIZE_READING_STATUS,
+                )
                 await perf_helper.measure_page_performance(page, "book_page")
 
     # ── 5. Verify reading list count ─────────────────────────────────────────

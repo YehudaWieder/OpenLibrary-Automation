@@ -4,6 +4,7 @@
   "BROWSER": "chromium",
   "TIMEOUT": 30000,
   "TEST_DATA_PATH": "data/test_data.json",
+  "RANDOMIZE_READING_STATUS": false,
   "PERFORMANCE_THRESHOLDS": {
     "search_page_first_paint_ms": 3000,
     "search_page_dom_content_loaded_ms": 3000,

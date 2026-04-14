@@ -2,6 +2,7 @@
 import random
 from typing import List
 
+from config import Config
 from pages.base_page import BasePage
 from utils.helpers import take_screenshot
 
@@ -14,7 +15,16 @@ class BookDetailsPage(BasePage):
     ALREADY_READ = "Already Read"
     ALLOWED_STATUSES = {WANT_TO_READ, ALREADY_READ}
 
-    async def add_books_to_reading_list(self, urls: list) -> List[str]:
+    def choose_reading_status(self, randomize_status: bool = False) -> str:
+        if randomize_status:
+            return random.choice([self.WANT_TO_READ, self.ALREADY_READ])
+        return self.WANT_TO_READ
+
+    async def add_books_to_reading_list(
+        self,
+        urls: list[str],
+        randomize_status: bool = Config.RANDOMIZE_READING_STATUS,
+    ) -> List[str]:
         screenshot_paths: List[str] = []
 
         for url in urls:
@@ -25,7 +35,7 @@ class BookDetailsPage(BasePage):
                 btn = self.page.locator(self.BOOK_BUTTON).first
                 await btn.wait_for(state="visible", timeout=10000)
 
-                chosen = random.choice([self.WANT_TO_READ, self.ALREADY_READ])
+                chosen = self.choose_reading_status(randomize_status=randomize_status)
                 self.logger.info(f"Choosing status: {chosen}")
 
                 if chosen == self.WANT_TO_READ:

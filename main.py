@@ -81,7 +81,12 @@ async def run_test():
 
             screenshots: list[str] = []
             for url in book_urls:
-                screenshots.extend(await details_page.add_books_to_reading_list([url]))
+                screenshots.extend(
+                    await details_page.add_books_to_reading_list(
+                        [url],
+                        randomize_status=Config.RANDOMIZE_READING_STATUS,
+                    )
+                )
                 await perf_helper.measure_page_performance(page, "book_page")
 
             perf_helper.set_run_context(
