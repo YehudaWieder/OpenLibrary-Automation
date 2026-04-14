@@ -89,5 +89,5 @@ dmypy.json
 .pyre/
 .cache/
 
-
+performance_report.html
 performance_report.json
