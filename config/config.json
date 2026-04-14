@@ -1,6 +1,6 @@
 {
   "BASE_URL": "https://openlibrary.org",
-  "HEADLESS": false,
+  "HEADLESS": true,
   "BROWSER": "chromium",
   "TIMEOUT": 30000,
   "TEST_DATA_PATH": "data/test_data.json",
