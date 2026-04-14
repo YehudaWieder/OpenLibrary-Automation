@@ -5,6 +5,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from utils.performance.performance_helper import PerformanceHelper
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,13 +74,12 @@ class PerformanceHtmlReportBuilder:
             name = metric.get("metric_name", "")
             value = metric.get("value", "")
             threshold = thresholds.get(name)
+            status = str(metric.get("status") or PerformanceHelper.classify_metric(value, threshold)[0])
 
-            if isinstance(value, (int, float)) and isinstance(threshold, (int, float)):
-                status = "OK" if value <= threshold else "EXCEEDED"
+            if PerformanceHelper.is_valid_metric_value(value) and isinstance(threshold, (int, float)):
                 threshold_display = str(threshold)
                 data_attrs = f"data-value='{value}' data-threshold='{threshold}'"
             else:
-                status = "N/A"
                 threshold_display = str(threshold) if threshold is not None else "—"
                 data_attrs = ""
 

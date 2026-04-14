@@ -1,7 +1,8 @@
 """Performance measurement helper for automation tests."""
 
+import math
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 from datetime import datetime
 from playwright.async_api import Page
 from config import Config
@@ -33,7 +34,69 @@ class PerformanceHelper:
         """Set arbitrary context values for the current run."""
         self.run_context.update(kwargs)
 
-    async def get_first_paint_time(self, page: Page) -> float:
+    @staticmethod
+    def is_valid_metric_value(value: object) -> bool:
+        """Return whether a performance metric value is finite and non-negative."""
+        return isinstance(value, (int, float)) and math.isfinite(value) and value >= 0
+
+    @classmethod
+    def normalize_metric_value(cls, value: object) -> Optional[int]:
+        """Normalize a metric value to integer milliseconds for storage/reporting."""
+        if not cls.is_valid_metric_value(value):
+            return None
+        return int(round(float(value)))
+
+    @classmethod
+    def classify_metric(cls, value: object, threshold: object) -> Tuple[str, Optional[str]]:
+        """Classify a metric value for logging and report rendering."""
+        normalized_value = cls.normalize_metric_value(value)
+        if normalized_value is None:
+            return "INVALID", None
+        if not isinstance(threshold, (int, float)):
+            return "N/A", None
+        if normalized_value > threshold:
+            return "EXCEEDED", f"{normalized_value}ms > {threshold}ms"
+        return "OK", f"{normalized_value}ms <= {threshold}ms"
+
+    @staticmethod
+    def format_metric_status(status: str, value: object, threshold: object) -> str:
+        """Build a human-readable metric status string."""
+        if status == "INVALID":
+            return f"INVALID ({value})"
+        if status == "EXCEEDED" and isinstance(threshold, (int, float)):
+            return f"⚠ EXCEEDED ({value:.0f}ms > {threshold}ms)"
+        if status == "OK" and isinstance(value, (int, float)):
+            return f"✓ OK ({value:.0f}ms)"
+        return "—"
+
+    async def _get_navigation_timing_metric(self, page: Page, metric_name: str) -> Optional[float]:
+        """Read a navigation timing metric using modern API first and validate it."""
+        value = await page.evaluate(
+            """(name) => {
+                const navigationEntry = performance.getEntriesByType('navigation')[0];
+                if (navigationEntry && typeof navigationEntry[name] === 'number') {
+                    const navigationValue = navigationEntry[name];
+                    return Number.isFinite(navigationValue) && navigationValue > 0 ? navigationValue : null;
+                }
+
+                const timing = performance.timing;
+                if (!timing || typeof timing.navigationStart !== 'number' || timing.navigationStart <= 0) {
+                    return null;
+                }
+
+                const endValue = timing[name];
+                if (typeof endValue !== 'number' || endValue <= 0) {
+                    return null;
+                }
+
+                const duration = endValue - timing.navigationStart;
+                return Number.isFinite(duration) && duration >= 0 ? duration : null;
+            }""",
+            metric_name,
+        )
+        return float(value) if self.is_valid_metric_value(value) else None
+
+    async def get_first_paint_time(self, page: Page) -> Optional[float]:
         """
         Get first paint time from page performance API.
         
@@ -43,13 +106,16 @@ class PerformanceHelper:
         Returns:
             First paint time in milliseconds
         """
-        return await page.evaluate("""() => {
+        value = await page.evaluate("""() => {
             const entries = performance.getEntriesByType('paint');
             const firstPaint = entries.find(entry => entry.name === 'first-paint');
-            return firstPaint ? firstPaint.startTime : 0;
+            return firstPaint && Number.isFinite(firstPaint.startTime) && firstPaint.startTime >= 0
+                ? firstPaint.startTime
+                : null;
         }""")
+        return float(value) if self.is_valid_metric_value(value) else None
 
-    async def get_dom_content_loaded_time(self, page: Page) -> float:
+    async def get_dom_content_loaded_time(self, page: Page) -> Optional[float]:
         """
         Get DOM content loaded time from performance API.
         
@@ -59,12 +125,9 @@ class PerformanceHelper:
         Returns:
             DOM content loaded time in milliseconds
         """
-        return await page.evaluate("""() => {
-            const timing = performance.timing;
-            return timing.domContentLoadedEventEnd - timing.navigationStart;
-        }""")
+        return await self._get_navigation_timing_metric(page, "domContentLoadedEventEnd")
 
-    async def get_load_time(self, page: Page) -> float:
+    async def get_load_time(self, page: Page) -> Optional[float]:
         """
         Get page load time from performance API.
         
@@ -74,12 +137,9 @@ class PerformanceHelper:
         Returns:
             Page load time in milliseconds
         """
-        return await page.evaluate("""() => {
-            const timing = performance.timing;
-            return timing.loadEventEnd - timing.navigationStart;
-        }""")
+        return await self._get_navigation_timing_metric(page, "loadEventEnd")
 
-    async def measure_page_performance(self, page: Page, page_type: str) -> Dict[str, float]:
+    async def measure_page_performance(self, page: Page, page_type: str) -> Dict[str, Optional[int]]:
         """
         Measure all performance metrics for a page.
         
@@ -90,14 +150,16 @@ class PerformanceHelper:
         Returns:
             Dictionary with performance metrics
         """
+        await page.wait_for_load_state("load")
+
         first_paint_ms = await self.get_first_paint_time(page)
         dom_content_loaded_ms = await self.get_dom_content_loaded_time(page)
         load_time_ms = await self.get_load_time(page)
         
         metrics = {
-            'first_paint_ms': first_paint_ms,
-            'dom_content_loaded_ms': dom_content_loaded_ms,
-            'load_time_ms': load_time_ms
+            'first_paint_ms': self.normalize_metric_value(first_paint_ms),
+            'dom_content_loaded_ms': self.normalize_metric_value(dom_content_loaded_ms),
+            'load_time_ms': self.normalize_metric_value(load_time_ms)
         }
         
         # Record metrics
@@ -111,7 +173,7 @@ class PerformanceHelper:
         self, 
         test_name: str, 
         metric_name: str, 
-        value: float
+        value: Optional[int]
     ) -> None:
         """
         Record a performance metric for a test.
@@ -121,20 +183,21 @@ class PerformanceHelper:
             metric_name: Name of the metric
             value: Metric value
         """
+        threshold = self.thresholds.get(metric_name) if isinstance(self.thresholds, dict) else None
+        status, details = self.classify_metric(value, threshold)
+
         self.test_results.append({
             "test_name": test_name,
             "metric_name": metric_name,
             "value": value,
+            "status": status,
             "timestamp": datetime.now().isoformat()
         })
-        
-        # Check threshold and log warning if exceeded
-        if (isinstance(self.thresholds, dict) and 
-            metric_name in self.thresholds and 
-            isinstance(value, (int, float)) and 
-            isinstance(self.thresholds[metric_name], (int, float)) and
-            value > self.thresholds[metric_name]):
-            logger.warning(f"Performance threshold exceeded for {metric_name}: {value:.2f}ms > {self.thresholds[metric_name]}ms")
+
+        if status == "INVALID":
+            logger.warning("Invalid performance metric recorded for %s: %s", metric_name, value)
+        elif status == "EXCEEDED":
+            logger.warning("Performance threshold exceeded for %s: %s", metric_name, details)
 
     def build_run_entry(self, test_name: Optional[str] = None) -> Dict[str, object]:
         """Build an immutable run payload to persist in repository layer."""
