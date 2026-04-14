@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-13T19:53:58.266346",
+  "last_updated": "2026-04-14T12:05:18.529790",
   "thresholds": {
     "search_page_first_paint_ms": 3000,
     "search_page_dom_content_loaded_ms": 3000,
@@ -15,135 +15,135 @@
     {
       "test_name": "search_page",
       "metric_name": "search_page_first_paint_ms",
-      "value": 0,
-      "timestamp": "2026-04-13T19:53:02.624195"
+      "value": 1880,
+      "timestamp": "2026-04-14T12:04:55.595021"
     },
     {
       "test_name": "search_page",
       "metric_name": "search_page_dom_content_loaded_ms",
-      "value": 9336,
-      "timestamp": "2026-04-13T19:53:02.624224"
+      "value": 1795,
+      "timestamp": "2026-04-14T12:04:55.595043"
     },
     {
       "test_name": "search_page",
       "metric_name": "search_page_load_time_ms",
-      "value": -1776099172789,
-      "timestamp": "2026-04-13T19:53:02.624703"
+      "value": 2232,
+      "timestamp": "2026-04-14T12:04:55.595051"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 7604,
-      "timestamp": "2026-04-13T19:53:15.640963"
+      "value": 3712,
+      "timestamp": "2026-04-14T12:05:00.655470"
     },
     {
-      "test_name": "book_pageככככ",
+      "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 7656,
-      "timestamp": "2026-04-13T19:53:15.641109"
+      "value": 1843,
+      "timestamp": "2026-04-14T12:05:00.656040"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 8493,
-      "timestamp": "2026-04-13T19:53:15.641212"
+      "value": 2624,
+      "timestamp": "2026-04-14T12:05:00.656051"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 6204,
-      "timestamp": "2026-04-13T19:53:26.150047"
+      "value": 1300,
+      "timestamp": "2026-04-14T12:05:03.973323"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 5874,
-      "timestamp": "2026-04-13T19:53:26.150180"
+      "value": 1290,
+      "timestamp": "2026-04-14T12:05:03.973337"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 6565,
-      "timestamp": "2026-04-13T19:53:26.150241"
+      "value": 1585,
+      "timestamp": "2026-04-14T12:05:03.973342"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 5592,
-      "timestamp": "2026-04-13T19:53:36.652332"
+      "value": 1908,
+      "timestamp": "2026-04-14T12:05:07.811903"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 5257,
-      "timestamp": "2026-04-13T19:53:36.652488"
+      "value": 1870,
+      "timestamp": "2026-04-14T12:05:07.811918"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 7640,
-      "timestamp": "2026-04-13T19:53:36.652558"
+      "value": 3405,
+      "timestamp": "2026-04-14T12:05:07.811923"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 5908,
-      "timestamp": "2026-04-13T19:53:46.762711"
+      "value": 4016,
+      "timestamp": "2026-04-14T12:05:12.624849"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 5622,
-      "timestamp": "2026-04-13T19:53:46.762860"
+      "value": 2295,
+      "timestamp": "2026-04-14T12:05:12.624969"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 7605,
-      "timestamp": "2026-04-13T19:53:46.762944"
+      "value": 3511,
+      "timestamp": "2026-04-14T12:05:12.624977"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 4712,
-      "timestamp": "2026-04-13T19:53:54.901243"
+      "value": 1352,
+      "timestamp": "2026-04-14T12:05:16.817465"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 4806,
-      "timestamp": "2026-04-13T19:53:54.901461"
+      "value": 1463,
+      "timestamp": "2026-04-14T12:05:16.817495"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 5058,
-      "timestamp": "2026-04-13T19:53:54.901548"
+      "value": 1941,
+      "timestamp": "2026-04-14T12:05:16.817500"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_first_paint_ms",
       "value": 0,
-      "timestamp": "2026-04-13T19:53:58.075466"
+      "timestamp": "2026-04-14T12:05:18.326021"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_dom_content_loaded_ms",
-      "value": 3006,
-      "timestamp": "2026-04-13T19:53:58.075481"
+      "value": 1145,
+      "timestamp": "2026-04-14T12:05:18.326036"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_load_time_ms",
-      "value": -1776099234913,
-      "timestamp": "2026-04-13T19:53:58.075614"
+      "value": 1481,
+      "timestamp": "2026-04-14T12:05:18.326042"
     }
   ],
   "runs": [
     {
-      "run_id": "20260413195358",
-      "started_at": "2026-04-13T19:51:32.840427",
-      "finished_at": "2026-04-13T19:53:58.266277",
+      "run_id": "20260414120518",
+      "started_at": "2026-04-14T12:04:06.808476",
+      "finished_at": "2026-04-14T12:05:18.529687",
       "test_name": "automation_test",
       "context": {
         "search_query": "Dune",
@@ -158,11 +158,11 @@
         ],
         "added_books_count": 5,
         "screenshots": [
-          "screenshots/195315_book_OL26242482M.png",
-          "screenshots/195325_book_OL7525229M.png",
-          "screenshots/195336_book_OL35638871M.png",
-          "screenshots/195346_book_OL8886573M.png",
-          "screenshots/195354_book_OL16829296M.png"
+          "screenshots/120500_book_OL26242482M.png",
+          "screenshots/120503_book_OL7525229M.png",
+          "screenshots/120506_book_OL35638871M.png",
+          "screenshots/120511_book_OL8886573M.png",
+          "screenshots/120516_book_OL16829296M.png"
         ],
         "expected_count": 5,
         "actual_count": 5
@@ -182,128 +182,128 @@
         {
           "test_name": "search_page",
           "metric_name": "search_page_first_paint_ms",
-          "value": 0,
-          "timestamp": "2026-04-13T19:53:02.624195"
+          "value": 1880,
+          "timestamp": "2026-04-14T12:04:55.595021"
         },
         {
           "test_name": "search_page",
           "metric_name": "search_page_dom_content_loaded_ms",
-          "value": 9336,
-          "timestamp": "2026-04-13T19:53:02.624224"
+          "value": 1795,
+          "timestamp": "2026-04-14T12:04:55.595043"
         },
         {
           "test_name": "search_page",
           "metric_name": "search_page_load_time_ms",
-          "value": -1776099172789,
-          "timestamp": "2026-04-13T19:53:02.624703"
+          "value": 2232,
+          "timestamp": "2026-04-14T12:04:55.595051"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 7604,
-          "timestamp": "2026-04-13T19:53:15.640963"
+          "value": 3712,
+          "timestamp": "2026-04-14T12:05:00.655470"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 7656,
-          "timestamp": "2026-04-13T19:53:15.641109"
+          "value": 1843,
+          "timestamp": "2026-04-14T12:05:00.656040"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 8493,
-          "timestamp": "2026-04-13T19:53:15.641212"
+          "value": 2624,
+          "timestamp": "2026-04-14T12:05:00.656051"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 6204,
-          "timestamp": "2026-04-13T19:53:26.150047"
+          "value": 1300,
+          "timestamp": "2026-04-14T12:05:03.973323"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 5874,
-          "timestamp": "2026-04-13T19:53:26.150180"
+          "value": 1290,
+          "timestamp": "2026-04-14T12:05:03.973337"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 6565,
-          "timestamp": "2026-04-13T19:53:26.150241"
+          "value": 1585,
+          "timestamp": "2026-04-14T12:05:03.973342"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 5592,
-          "timestamp": "2026-04-13T19:53:36.652332"
+          "value": 1908,
+          "timestamp": "2026-04-14T12:05:07.811903"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 5257,
-          "timestamp": "2026-04-13T19:53:36.652488"
+          "value": 1870,
+          "timestamp": "2026-04-14T12:05:07.811918"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 7640,
-          "timestamp": "2026-04-13T19:53:36.652558"
+          "value": 3405,
+          "timestamp": "2026-04-14T12:05:07.811923"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 5908,
-          "timestamp": "2026-04-13T19:53:46.762711"
+          "value": 4016,
+          "timestamp": "2026-04-14T12:05:12.624849"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 5622,
-          "timestamp": "2026-04-13T19:53:46.762860"
+          "value": 2295,
+          "timestamp": "2026-04-14T12:05:12.624969"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 7605,
-          "timestamp": "2026-04-13T19:53:46.762944"
+          "value": 3511,
+          "timestamp": "2026-04-14T12:05:12.624977"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 4712,
-          "timestamp": "2026-04-13T19:53:54.901243"
+          "value": 1352,
+          "timestamp": "2026-04-14T12:05:16.817465"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 4806,
-          "timestamp": "2026-04-13T19:53:54.901461"
+          "value": 1463,
+          "timestamp": "2026-04-14T12:05:16.817495"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 5058,
-          "timestamp": "2026-04-13T19:53:54.901548"
+          "value": 1941,
+          "timestamp": "2026-04-14T12:05:16.817500"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_first_paint_ms",
           "value": 0,
-          "timestamp": "2026-04-13T19:53:58.075466"
+          "timestamp": "2026-04-14T12:05:18.326021"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_dom_content_loaded_ms",
-          "value": 3006,
-          "timestamp": "2026-04-13T19:53:58.075481"
+          "value": 1145,
+          "timestamp": "2026-04-14T12:05:18.326036"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_load_time_ms",
-          "value": -1776099234913,
-          "timestamp": "2026-04-13T19:53:58.075614"
+          "value": 1481,
+          "timestamp": "2026-04-14T12:05:18.326042"
         }
       ]
     }
