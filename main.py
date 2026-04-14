@@ -30,7 +30,7 @@ async def run_test():
     report_opener = ReportOpener()
     
     async with async_playwright() as p:
-        # 1. Setup Browser
+        # Setup Browser
         logger.info(f"Launching {Config.BROWSER}...")
         
         browser_launcher = getattr(p, Config.BROWSER)
@@ -39,7 +39,7 @@ async def run_test():
         page = await context.new_page()
 
         try:
-            # 2. Login Phase
+            # Login Phase
             login_page = LoginPage(page)
             await login_page.open_login()
             await login_page.login(Config.EMAIL_INPUT, Config.PASSWORD_INPUT)
@@ -48,7 +48,7 @@ async def run_test():
             user_books_page = UserBooksPage(page)
             await user_books_page.clear_reading_lists()
 
-            # 3. Search Phase (Task #1)
+            # Load Test Data Phase
             test_data = load_test_data(Config.TEST_DATA_PATH)
             search_query = test_data.get("search_query")
             max_year = test_data.get("max_year")
@@ -59,6 +59,7 @@ async def run_test():
                 limit=limit,
             )
 
+            # Search Phase
             home_page = HomePage(page)
             book_urls = await search_books_by_title_under_year(
                 home_page=home_page,
@@ -72,8 +73,7 @@ async def run_test():
                 logger.error("No books found matching criteria. Stopping test.")
                 return
 
-            # 4. Action Phase: Add to Reading List (Task #2)
-            # We already have book_urls. Now we visit each one.
+            # Action Phase: Add to Reading List
             from pages.book_details_page import BookDetailsPage
             details_page = BookDetailsPage(page)
 
@@ -88,7 +88,7 @@ async def run_test():
                 screenshots=screenshots,
             )
 
-            # 5. Assertion Phase (Task #3)
+            # Assertion Phase
             user_books_page = UserBooksPage(page)
             await user_books_page.open()
             await perf_helper.measure_page_performance(page, "reading_list")
