@@ -1,12 +1,12 @@
 import logging
-from typing import List
+from typing import List, Optional
 from pages.home_page import HomePage
 
 logger = logging.getLogger(__name__)
 
 
-def _is_valid_year(year: int, max_year: int) -> bool:
-    return year and year <= max_year
+def _is_valid_year(year: Optional[int], max_year: int) -> bool:
+    return year is not None and year <= max_year
 
 
 async def search_books_by_title_under_year(
@@ -32,6 +32,10 @@ async def search_books_by_title_under_year(
                 break
 
             year = await home_page.extract_book_year(item)
+            if year is None:
+                logger.info("Skipping search result because no publication year was found")
+                continue
+
             if _is_valid_year(year, max_year):
                 url = await home_page.extract_book_url(item)
                 if url:

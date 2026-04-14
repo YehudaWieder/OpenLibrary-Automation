@@ -1,5 +1,8 @@
 # pages/home_page.py
 import re
+from datetime import datetime
+from typing import Optional
+
 from pages.base_page import BasePage
 from config import Config  # Assuming BASE_URL is in your config
 
@@ -9,6 +12,7 @@ class HomePage(BasePage):
     _RESULT_ITEMS = ".searchResultItem"
     _BOOK_LINK = "h3.booktitle a"
     _NEXT_PAGE = "a[aria-label='Go to next page']"
+    _YEAR_PATTERN = re.compile(r"\b(\d{4})\b")
 
     async def open(self):
         """Navigate to the base URL."""
@@ -25,11 +29,23 @@ class HomePage(BasePage):
         await self.page.locator(self._RESULT_ITEMS).first.wait_for(state="visible")
         return await self.page.locator(self._RESULT_ITEMS).all()
 
-    async def extract_book_year(self, item) -> int:
+    @classmethod
+    def parse_book_year(cls, text: str) -> Optional[int]:
+        """Extract the earliest valid 4-digit year from result text."""
+        candidate_years = [
+            int(year)
+            for year in cls._YEAR_PATTERN.findall(text)
+            if 1000 <= int(year) <= datetime.now().year + 1
+        ]
+        return min(candidate_years) if candidate_years else None
+
+    async def extract_book_year(self, item) -> Optional[int]:
         """Extract the publication year from a search result item."""
         text = await item.inner_text()
-        match = re.search(r"First published in (\d{4})", text)
-        return int(match.group(1)) if match else 0
+        year = self.parse_book_year(text)
+        if year is None:
+            self.logger.warning("Could not extract publication year from search result: %s", text)
+        return year
 
     async def extract_book_url(self, item) -> str:
         """Extract the book details URL from a search result item."""
