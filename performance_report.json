@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-14T12:05:18.529790",
+  "last_updated": "2026-04-15T16:51:40.764623",
   "thresholds": {
     "search_page_first_paint_ms": 3000,
     "search_page_dom_content_loaded_ms": 3000,
@@ -15,155 +15,178 @@
     {
       "test_name": "search_page",
       "metric_name": "search_page_first_paint_ms",
-      "value": 1880,
-      "timestamp": "2026-04-14T12:04:55.595021"
+      "value": 2284,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:15.785559"
     },
     {
       "test_name": "search_page",
       "metric_name": "search_page_dom_content_loaded_ms",
-      "value": 1795,
-      "timestamp": "2026-04-14T12:04:55.595043"
+      "value": 2434,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:15.785585"
     },
     {
       "test_name": "search_page",
       "metric_name": "search_page_load_time_ms",
-      "value": 2232,
-      "timestamp": "2026-04-14T12:04:55.595051"
+      "value": 2830,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:15.785596"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 3712,
-      "timestamp": "2026-04-14T12:05:00.655470"
+      "value": 2164,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.819085"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 1843,
-      "timestamp": "2026-04-14T12:05:00.656040"
+      "value": 1971,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.819114"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 2624,
-      "timestamp": "2026-04-14T12:05:00.656051"
+      "value": 2192,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.819123"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 1300,
-      "timestamp": "2026-04-14T12:05:03.973323"
+      "value": 2164,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.847004"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 1290,
-      "timestamp": "2026-04-14T12:05:03.973337"
+      "value": 1971,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.847020"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 1585,
-      "timestamp": "2026-04-14T12:05:03.973342"
+      "value": 2192,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.847029"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 1908,
-      "timestamp": "2026-04-14T12:05:07.811903"
+      "value": 2164,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.898997"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 1870,
-      "timestamp": "2026-04-14T12:05:07.811918"
+      "value": 1971,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.899022"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 3405,
-      "timestamp": "2026-04-14T12:05:07.811923"
+      "value": 2192,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.899030"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 4016,
-      "timestamp": "2026-04-14T12:05:12.624849"
+      "value": 2164,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.936354"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 2295,
-      "timestamp": "2026-04-14T12:05:12.624969"
+      "value": 1971,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.936373"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 3511,
-      "timestamp": "2026-04-14T12:05:12.624977"
+      "value": 2192,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.936382"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_first_paint_ms",
-      "value": 1352,
-      "timestamp": "2026-04-14T12:05:16.817465"
+      "value": 2164,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.967939"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_dom_content_loaded_ms",
-      "value": 1463,
-      "timestamp": "2026-04-14T12:05:16.817495"
+      "value": 1971,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.967953"
     },
     {
       "test_name": "book_page",
       "metric_name": "book_page_load_time_ms",
-      "value": 1941,
-      "timestamp": "2026-04-14T12:05:16.817500"
+      "value": 2192,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:34.967960"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_first_paint_ms",
-      "value": 0,
-      "timestamp": "2026-04-14T12:05:18.326021"
+      "value": null,
+      "status": "INVALID",
+      "timestamp": "2026-04-15T16:51:40.763316"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_dom_content_loaded_ms",
-      "value": 1145,
-      "timestamp": "2026-04-14T12:05:18.326036"
+      "value": 1362,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:40.763457"
     },
     {
       "test_name": "reading_list",
       "metric_name": "reading_list_load_time_ms",
-      "value": 1481,
-      "timestamp": "2026-04-14T12:05:18.326042"
+      "value": 1755,
+      "status": "OK",
+      "timestamp": "2026-04-15T16:51:40.763467"
     }
   ],
   "runs": [
     {
-      "run_id": "20260414120518",
-      "started_at": "2026-04-14T12:04:06.808476",
-      "finished_at": "2026-04-14T12:05:18.529687",
+      "run_id": "20260415165140",
+      "started_at": "2026-04-15T16:50:48.717942",
+      "finished_at": "2026-04-15T16:51:40.764535",
       "test_name": "automation_test",
       "context": {
+        "run_status": "PASSED",
+        "failure_details": "",
         "search_query": "Dune",
         "max_year": 1980,
         "limit": 5,
-        "added_book_urls": [
+        "screenshots": [
+          "screenshots/165119_book_OL26242482M.png",
+          "screenshots/165123_book_OL7525229M.png",
+          "screenshots/165127_book_OL35638871M.png",
+          "screenshots/165131_book_OL8886573M.png",
+          "screenshots/165134_book_OL16829296M.png"
+        ],
+        "requested_book_urls": [
           "https://openlibrary.org/works/OL893415W/Dune?edition=key%3A/books/OL26242482M",
           "https://openlibrary.org/works/OL893526W/Dune_Messiah?edition=key%3A/books/OL7525229M",
           "https://openlibrary.org/works/OL472165W/Peril_at_End_House?edition=key%3A/books/OL35638871M",
           "https://openlibrary.org/works/OL274574W/Crónica_de_una_muerte_anunciada?edition=key%3A/books/OL8886573M",
           "https://openlibrary.org/works/OL1105384W/Memoirs_of_a_Revolutionist?edition=key%3A/books/OL16829296M"
         ],
-        "added_books_count": 5,
-        "screenshots": [
-          "screenshots/120500_book_OL26242482M.png",
-          "screenshots/120503_book_OL7525229M.png",
-          "screenshots/120506_book_OL35638871M.png",
-          "screenshots/120511_book_OL8886573M.png",
-          "screenshots/120516_book_OL16829296M.png"
-        ],
+        "requested_books_count": 5,
         "expected_count": 5,
         "actual_count": 5
       },
@@ -182,128 +205,149 @@
         {
           "test_name": "search_page",
           "metric_name": "search_page_first_paint_ms",
-          "value": 1880,
-          "timestamp": "2026-04-14T12:04:55.595021"
+          "value": 2284,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:15.785559"
         },
         {
           "test_name": "search_page",
           "metric_name": "search_page_dom_content_loaded_ms",
-          "value": 1795,
-          "timestamp": "2026-04-14T12:04:55.595043"
+          "value": 2434,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:15.785585"
         },
         {
           "test_name": "search_page",
           "metric_name": "search_page_load_time_ms",
-          "value": 2232,
-          "timestamp": "2026-04-14T12:04:55.595051"
+          "value": 2830,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:15.785596"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 3712,
-          "timestamp": "2026-04-14T12:05:00.655470"
+          "value": 2164,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.819085"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 1843,
-          "timestamp": "2026-04-14T12:05:00.656040"
+          "value": 1971,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.819114"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 2624,
-          "timestamp": "2026-04-14T12:05:00.656051"
+          "value": 2192,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.819123"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 1300,
-          "timestamp": "2026-04-14T12:05:03.973323"
+          "value": 2164,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.847004"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 1290,
-          "timestamp": "2026-04-14T12:05:03.973337"
+          "value": 1971,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.847020"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 1585,
-          "timestamp": "2026-04-14T12:05:03.973342"
+          "value": 2192,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.847029"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 1908,
-          "timestamp": "2026-04-14T12:05:07.811903"
+          "value": 2164,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.898997"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 1870,
-          "timestamp": "2026-04-14T12:05:07.811918"
+          "value": 1971,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.899022"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 3405,
-          "timestamp": "2026-04-14T12:05:07.811923"
+          "value": 2192,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.899030"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 4016,
-          "timestamp": "2026-04-14T12:05:12.624849"
+          "value": 2164,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.936354"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 2295,
-          "timestamp": "2026-04-14T12:05:12.624969"
+          "value": 1971,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.936373"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 3511,
-          "timestamp": "2026-04-14T12:05:12.624977"
+          "value": 2192,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.936382"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_first_paint_ms",
-          "value": 1352,
-          "timestamp": "2026-04-14T12:05:16.817465"
+          "value": 2164,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.967939"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_dom_content_loaded_ms",
-          "value": 1463,
-          "timestamp": "2026-04-14T12:05:16.817495"
+          "value": 1971,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.967953"
         },
         {
           "test_name": "book_page",
           "metric_name": "book_page_load_time_ms",
-          "value": 1941,
-          "timestamp": "2026-04-14T12:05:16.817500"
+          "value": 2192,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:34.967960"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_first_paint_ms",
-          "value": 0,
-          "timestamp": "2026-04-14T12:05:18.326021"
+          "value": null,
+          "status": "INVALID",
+          "timestamp": "2026-04-15T16:51:40.763316"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_dom_content_loaded_ms",
-          "value": 1145,
-          "timestamp": "2026-04-14T12:05:18.326036"
+          "value": 1362,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:40.763457"
         },
         {
           "test_name": "reading_list",
           "metric_name": "reading_list_load_time_ms",
-          "value": 1481,
-          "timestamp": "2026-04-14T12:05:18.326042"
+          "value": 1755,
+          "status": "OK",
+          "timestamp": "2026-04-15T16:51:40.763467"
         }
       ]
     }
