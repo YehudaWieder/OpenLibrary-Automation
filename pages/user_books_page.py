@@ -5,8 +5,8 @@ from config import Config
 
 class UserBooksPage(BasePage):
     # Selectors based on your input
-    WANT_TO_READ_BUTTON = "a[data-ol-link-track='BookCarousel|HeaderClick|want-to-read']"
-    ALREADY_READ_BUTTON = "a[data-ol-link-track='BookCarousel|HeaderClick|already-read']"
+    WANT_TO_READ_LINK = "a[data-ol-link-track='MyBooksSidebar|WantToRead']"
+    ALREADY_READ_LINK = "a[data-ol-link-track='MyBooksSidebar|AlreadyRead']"
     BOOK_ITEM = ".searchResultItem"
     BOOK_TOGGLE_BUTTON = "button.book-progress-btn"
     MAX_ATTEMPTS_FOR_CLEARING = 10
@@ -30,11 +30,11 @@ class UserBooksPage(BasePage):
 
     async def get_want_to_read_count(self) -> int:
         """Return the 'Want to Read' count."""
-        return await self._extract_count(self.WANT_TO_READ_BUTTON)
+        return await self._extract_count(self.WANT_TO_READ_LINK)
 
     async def get_already_read_count(self) -> int:
         """Return the 'Already Read' count."""
-        return await self._extract_count(self.ALREADY_READ_BUTTON)
+        return await self._extract_count(self.ALREADY_READ_LINK)
 
     async def get_reading_list_total(self) -> int:
         """Return the combined total of both reading list categories."""
@@ -90,9 +90,9 @@ class UserBooksPage(BasePage):
     async def clear_reading_lists(self) -> None:
         """Clear all books from both Want to Read and Already Read lists."""
         await self.open()
-        await self.clear_list(self.WANT_TO_READ_BUTTON)
+        await self.clear_list(self.WANT_TO_READ_LINK)
         await self.page.wait_for_load_state("networkidle")
         
         await self.open()
-        await self.clear_list(self.ALREADY_READ_BUTTON)
+        await self.clear_list(self.ALREADY_READ_LINK)
         self.logger.info("Cleared all reading lists")
