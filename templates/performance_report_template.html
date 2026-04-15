@@ -366,8 +366,9 @@
 
     /* ── Context Grid ─────────────────────────────── */
     .ctx-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
     }
 
@@ -404,10 +405,14 @@
     }
 
     .ctx-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: var(--r-sm);
-      padding: 8px 12px;
+      padding: 6px 10px;
+      max-width: 100%;
     }
 
     .ctx-key {
@@ -416,13 +421,14 @@
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: var(--text-3);
+      white-space: nowrap;
     }
 
     .ctx-val {
       font-size: 0.84rem;
-      margin-top: 2px;
       color: var(--text);
       word-break: break-word;
+      line-height: 1.25;
     }
 
     /* ── Metrics Table ────────────────────────────── */
@@ -563,7 +569,7 @@
       .run-pills { display: none; }
       .run-result { font-size: 0.62rem; padding: 3px 8px; }
       .metric-bar-track { max-width: 80px; }
-      .ctx-grid { grid-template-columns: 1fr; }
+      .ctx-grid { gap: 7px; }
       .shots { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     }
   </style>

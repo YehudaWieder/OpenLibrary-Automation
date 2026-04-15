@@ -74,6 +74,12 @@ class PerformanceHtmlReportBuilder:
         thresholds = run.get("thresholds", {}) if isinstance(run.get("thresholds"), dict) else {}
         screenshots = context.get("screenshots", []) if isinstance(context.get("screenshots"), list) else []
         added_urls = context.get("added_book_urls") if isinstance(context.get("added_book_urls"), list) else []
+        requested_urls = (
+            context.get("requested_book_urls")
+            if isinstance(context.get("requested_book_urls"), list)
+            else []
+        )
+        urls_to_render = requested_urls or added_urls
 
         run_status_raw = str(context.get("run_status") or run.get("run_status") or "PASSED").upper()
         run_status = "FAILED" if run_status_raw == "FAILED" else "PASSED"
@@ -81,11 +87,19 @@ class PerformanceHtmlReportBuilder:
         has_failure_details = run_status == "FAILED" and bool(failure_details)
 
         expected_count = context.get("expected_count")
+        requested_books_count = context.get("requested_books_count")
         added_books_count = context.get("added_books_count")
 
         filtered_context: Dict[str, object] = {}
         for key, value in context.items():
-            if key in {"screenshots", "added_book_urls", "failure_details", "run_status"}:
+            if key in {
+                "screenshots",
+                "added_book_urls",
+                "requested_book_urls",
+                "requested_books_count",
+                "failure_details",
+                "run_status",
+            }:
                 continue
             # Avoid duplicate count presentation when both represent the same number.
             if key == "added_books_count" and expected_count is not None and value == expected_count:
@@ -95,13 +109,13 @@ class PerformanceHtmlReportBuilder:
             filtered_context[key] = value
 
         urls_html = ""
-        if added_urls:
+        if urls_to_render:
             urls_items = "".join(
                 f"<li><a href='{html.escape(str(url))}' target='_blank' rel='noopener noreferrer'>{html.escape(str(url))}</a></li>"
-                for url in added_urls
+                for url in urls_to_render
             )
             urls_html = (
-                "<div class='section-label'>Added Book URLs</div>"
+                "<div class='section-label'>Book URLs</div>"
                 "<div class='urls-panel'><ol class='urls-list'>"
                 f"{urls_items}"
                 "</ol></div>"
