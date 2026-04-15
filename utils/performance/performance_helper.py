@@ -70,27 +70,15 @@ class PerformanceHelper:
         return "—"
 
     async def _get_navigation_timing_metric(self, page: Page, metric_name: str) -> Optional[float]:
-        """Read a navigation timing metric using modern API first and validate it."""
+        """Read a navigation timing metric from Navigation Timing Level 2 entries."""
         value = await page.evaluate(
             """(name) => {
                 const navigationEntry = performance.getEntriesByType('navigation')[0];
-                if (navigationEntry && typeof navigationEntry[name] === 'number') {
-                    const navigationValue = navigationEntry[name];
-                    return Number.isFinite(navigationValue) && navigationValue > 0 ? navigationValue : null;
-                }
-
-                const timing = performance.timing;
-                if (!timing || typeof timing.navigationStart !== 'number' || timing.navigationStart <= 0) {
+                if (!navigationEntry || typeof navigationEntry[name] !== 'number') {
                     return null;
                 }
-
-                const endValue = timing[name];
-                if (typeof endValue !== 'number' || endValue <= 0) {
-                    return null;
-                }
-
-                const duration = endValue - timing.navigationStart;
-                return Number.isFinite(duration) && duration >= 0 ? duration : null;
+                const navigationValue = navigationEntry[name];
+                return Number.isFinite(navigationValue) && navigationValue > 0 ? navigationValue : null;
             }""",
             metric_name,
         )
