@@ -74,6 +74,7 @@ class BookDetailsPage(BasePage):
 
             except Exception as e:
                 self.logger.error(f"Failed to update reading status: {e}")
-                raise
+                # Continue with next URL; final validation will detect missing additions.
+                continue
 
         return screenshot_paths

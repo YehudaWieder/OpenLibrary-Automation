@@ -96,8 +96,9 @@ async def run_test():
                 raise RuntimeError("No books found matching criteria")
 
             # Action Phase: Add to Reading List
+            await add_books_to_reading_list(book_urls)
+
             for url in book_urls:
-                await add_books_to_reading_list([url])
                 await measure_page_performance(
                     page=page,
                     url=url,
@@ -105,8 +106,8 @@ async def run_test():
                 )
 
             perf_helper.set_run_context(
-                added_book_urls=book_urls,
-                added_books_count=len(book_urls),
+                requested_book_urls=book_urls,
+                requested_books_count=len(book_urls),
             )
 
             # Assertion Phase
