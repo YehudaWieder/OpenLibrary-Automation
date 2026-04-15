@@ -45,6 +45,7 @@ OpenLibrary-Automation/
 ├── tests/
 │   └── test_openlibrary.py
 ├── utils/
+│   ├── openlibrary_flow_api.py
 │   ├── data_loader.py
 │   ├── reading_list_utils.py
 │   ├── search_utils.py
@@ -71,19 +72,30 @@ OpenLibrary-Automation/
 - Each page class encapsulates selectors and DOM interactions for one screen.
 - Business rules are kept outside page classes where possible.
 
-### 2) Business Logic Layer
+### 2) Facade / Flow API Layer
+
+- `utils/openlibrary_flow_api.py` exposes the four spec-facing public functions with signatures that match the project requirements exactly:
+  - `search_books_by_title_under_year(query, max_year, limit)` — search + year filter + pagination
+  - `add_books_to_reading_list(urls)` — random Want/Already-Read per book + screenshot
+  - `assert_reading_list_count(expected_count)` — open list page, read sidebar counts, assert
+  - `measure_page_performance(page, url, threshold_ms)` — collect timing metrics, log threshold warnings
+- Uses `ContextVar[FlowContext]` to share `page` and `perf_helper` across calls without polluting public signatures.
+- Internal helpers (`prepare_authenticated_session`, `reset_reading_lists`) are kept private to this module.
+- All POM classes are used internally; callers never touch page objects directly.
+
+### 3) Business Logic Layer
 
 - `utils/search_utils.py` handles search/filter logic by year and limit.
 - `utils/reading_list_utils.py` handles reading list assertions.
 
-### 3) Performance Layer (SRP Split)
+### 4) Performance Layer (SRP Split)
 
 - `performance_helper.py`: collect runtime performance metrics in memory.
 - `performance_repository.py`: persist/read performance JSON history.
 - `performance_html_report.py`: render HTML from report data + template.
 - `report_opener.py`: open generated report file.
 
-### 4) Orchestration Layer
+### 5) Orchestration Layer
 
 - `main.py` coordinates end-to-end flow, collects run context, and triggers report generation.
 
