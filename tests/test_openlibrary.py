@@ -11,14 +11,25 @@ import allure
 import pytest
 
 from config import Config
-from pages.book_details_page import BookDetailsPage
-from pages.home_page import HomePage
-from pages.login_page import LoginPage
 from pages.user_books_page import UserBooksPage
+from utils.openlibrary_flow_api import (
+    add_books_to_reading_list,
+    assert_reading_list_count,
+    clear_flow_context,
+    configure_flow_context,
+    measure_page_performance,
+    prepare_authenticated_session,
+    reset_reading_lists,
+    search_books_by_title_under_year,
+)
 from utils.performance.performance_repository import PerformanceRepository
 from utils.performance.performance_helper import PerformanceHelper
-from utils.reading_list_utils import assert_reading_lists_count
-from utils.search_utils import search_books_by_title_under_year
+
+
+@pytest.fixture(autouse=True)
+def _reset_flow_context_after_test():
+    yield
+    clear_flow_context()
 
 
 @allure.epic("OpenLibrary Automation")
@@ -27,17 +38,19 @@ from utils.search_utils import search_books_by_title_under_year
 @pytest.mark.asyncio
 async def test_add_books_to_reading_list(browser_context, perf_helper, test_data):
     page = browser_context
+    configure_flow_context(
+        page=page,
+        perf_helper=perf_helper,
+        randomize_reading_status=Config.RANDOMIZE_READING_STATUS,
+    )
 
     # ── 1. Login ────────────────────────────────────────────────────────────
     with allure.step("Login to OpenLibrary"):
-        login_page = LoginPage(page)
-        await login_page.open_login()
-        await login_page.login(Config.EMAIL_INPUT, Config.PASSWORD_INPUT)
+        await prepare_authenticated_session()
 
     # ── 2. Clear existing reading lists ─────────────────────────────────────
     with allure.step("Clear existing reading lists"):
-        user_books_page = UserBooksPage(page)
-        await user_books_page.clear_reading_lists()
+        await reset_reading_lists()
 
     # ── 3. Search ────────────────────────────────────────────────────────────
     search_query = test_data.get("search_query")
@@ -45,15 +58,17 @@ async def test_add_books_to_reading_list(browser_context, perf_helper, test_data
     limit = test_data.get("limit")
 
     with allure.step(f"Search books: query='{search_query}', max_year={max_year}, limit={limit}"):
-        home_page = HomePage(page)
         book_urls = await search_books_by_title_under_year(
-            home_page=home_page,
             query=search_query,
             max_year=max_year,
             limit=limit,
         )
 
-        await perf_helper.measure_page_performance(page, "search_page")
+        await measure_page_performance(
+            page=page,
+            url=f"{Config.BASE_URL}/search?q={search_query}",
+            threshold_ms=3000,
+        )
 
         allure.attach(
             "\n".join(book_urls),
@@ -65,20 +80,29 @@ async def test_add_books_to_reading_list(browser_context, perf_helper, test_data
 
     # ── 4. Add books to reading list ─────────────────────────────────────────
     with allure.step(f"Add {len(book_urls)} books to reading list"):
-        details_page = BookDetailsPage(page)
         for i, url in enumerate(book_urls, start=1):
             with allure.step(f"Book {i}: {url}"):
-                await details_page.add_books_to_reading_list(
+                await add_books_to_reading_list(
                     [url],
-                    randomize_status=Config.RANDOMIZE_READING_STATUS,
                 )
-                await perf_helper.measure_page_performance(page, "book_page")
+                await measure_page_performance(
+                    page=page,
+                    url=url,
+                    threshold_ms=2500,
+                )
 
     # ── 5. Verify reading list count ─────────────────────────────────────────
     with allure.step("Verify reading list total count"):
-        await user_books_page.open()
-        await perf_helper.measure_page_performance(page, "reading_list")
+        await assert_reading_list_count(
+            expected_count=len(book_urls),
+        )
+        await measure_page_performance(
+            page=page,
+            url=f"{Config.BASE_URL}/account/books",
+            threshold_ms=2000,
+        )
 
+        user_books_page = UserBooksPage(page)
         want_count = await user_books_page.get_want_to_read_count()
         already_count = await user_books_page.get_already_read_count()
         total = await user_books_page.get_reading_list_total()
@@ -90,11 +114,6 @@ async def test_add_books_to_reading_list(browser_context, perf_helper, test_data
             ),
             name="Reading list counts",
             attachment_type=allure.attachment_type.JSON,
-        )
-
-        await assert_reading_lists_count(
-            user_books_page=user_books_page,
-            expected_count=len(book_urls),
         )
 
     # ── 6. Attach performance report ─────────────────────────────────────────
