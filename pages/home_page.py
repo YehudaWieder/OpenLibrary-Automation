@@ -11,7 +11,7 @@ class HomePage(BasePage):
     _SEARCH_INPUT = "input[name='q']"
     _RESULT_ITEMS = ".searchResultItem"
     _BOOK_LINK = "h3.booktitle a"
-    _NEXT_PAGE = "a[aria-label='Go to next page']"
+    _NEXT_PAGE = "a.pagination-item.pagination-arrow[aria-label='Go to next page']"
     _YEAR_PATTERN = re.compile(r"\b(\d{4})\b")
 
     async def open(self):
