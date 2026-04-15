@@ -51,6 +51,26 @@ async def test_measure_page_performance_records_invalid_missing_navigation_metri
     assert [entry["status"] for entry in helper.test_results] == ["OK", "INVALID", "INVALID"]
 
 
+@pytest.mark.asyncio
+async def test_measure_page_performance_marks_zero_first_paint_invalid() -> None:
+    helper = PerformanceHelper()
+    helper.thresholds = {
+        "reading_list_first_paint_ms": 2000,
+        "reading_list_dom_content_loaded_ms": 2000,
+        "reading_list_load_time_ms": 2000,
+    }
+    page = FakePerformancePage([0.0, 950.0, 1200.0])
+
+    metrics = await helper.measure_page_performance(page, "reading_list")
+
+    assert metrics == {
+        "first_paint_ms": None,
+        "dom_content_loaded_ms": 950,
+        "load_time_ms": 1200,
+    }
+    assert [entry["status"] for entry in helper.test_results] == ["INVALID", "OK", "OK"]
+
+
 def test_html_report_marks_invalid_metric(tmp_path: Path) -> None:
     template_path = tmp_path / "template.html"
     output_path = tmp_path / "report.html"

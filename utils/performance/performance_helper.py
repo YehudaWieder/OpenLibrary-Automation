@@ -109,11 +109,15 @@ class PerformanceHelper:
         value = await page.evaluate("""() => {
             const entries = performance.getEntriesByType('paint');
             const firstPaint = entries.find(entry => entry.name === 'first-paint');
-            return firstPaint && Number.isFinite(firstPaint.startTime) && firstPaint.startTime >= 0
+            // A 0ms first-paint is treated as missing/invalid in this project.
+            return firstPaint && Number.isFinite(firstPaint.startTime) && firstPaint.startTime > 0
                 ? firstPaint.startTime
                 : null;
         }""")
-        return float(value) if self.is_valid_metric_value(value) else None
+        if not self.is_valid_metric_value(value):
+            return None
+        first_paint = float(value)
+        return first_paint if first_paint > 0 else None
 
     async def get_dom_content_loaded_time(self, page: Page) -> Optional[float]:
         """
