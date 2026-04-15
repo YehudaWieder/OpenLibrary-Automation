@@ -4,7 +4,7 @@ from typing import List
 
 from config import Config
 from pages.base_page import BasePage
-from utils.helpers import take_screenshot
+from utils.screenshot_utils import take_screenshot
 
 class BookDetailsPage(BasePage):
 

@@ -48,7 +48,7 @@ OpenLibrary-Automation/
 │   ├── data_loader.py
 │   ├── reading_list_utils.py
 │   ├── search_utils.py
-│   ├── helpers.py
+│   ├── screenshot_utils.py
 │   └── performance/
 │       ├── __init__.py
 │       ├── performance_helper.py
