@@ -55,6 +55,7 @@ OpenLibrary-Automation/
 │       ├── performance_helper.py
 │       ├── performance_repository.py
 │       ├── performance_html_report.py
+│       ├── run_lifecycle.py
 │       └── report_opener.py
 ├── templates/
 │   └── performance_report_template.html
@@ -93,11 +94,13 @@ OpenLibrary-Automation/
 - `performance_helper.py`: collect runtime performance metrics in memory.
 - `performance_repository.py`: persist/read performance JSON history.
 - `performance_html_report.py`: render HTML from report data + template.
+- `run_lifecycle.py`: centralize run status finalization and report publish flow.
 - `report_opener.py`: open generated report file.
 
 ### 5) Orchestration Layer
 
-- `main.py` coordinates end-to-end flow, collects run context, and triggers report generation.
+- `main.py` contains the explicit business flow calls (login, search, add, assert, performance checks).
+- `utils/performance/run_lifecycle.py` owns run state (pass/fail), status finalization, and report persistence/publishing.
 
 ## Configuration
 

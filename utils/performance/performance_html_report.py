@@ -2,6 +2,7 @@
 
 import html
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -38,7 +39,7 @@ class PerformanceHtmlReportBuilder:
             template = handle.read()
 
         page_html = (
-            template.replace("{{LAST_UPDATED}}", html.escape(str(report_data.get("last_updated", ""))))
+            template.replace("{{LAST_UPDATED}}", html.escape(self._format_datetime(report_data.get("last_updated"))))
             .replace("{{TOTAL_RUNS}}", str(len(runs)))
             .replace("{{TOTAL_METRICS}}", str(total_metrics))
             .replace("{{RUN_SECTIONS}}", "".join(run_sections) or "<p>No runs found.</p>")
@@ -50,11 +51,61 @@ class PerformanceHtmlReportBuilder:
         logger.info("HTML report generated at %s", self.html_output_path)
         return str(self.html_output_path)
 
+    @staticmethod
+    def _format_datetime(value: object) -> str:
+        """Format ISO date values to a readable local timestamp."""
+        if not value:
+            return "—"
+
+        raw = str(value).strip()
+        if not raw:
+            return "—"
+
+        candidate = raw.replace("Z", "+00:00")
+        try:
+            dt = datetime.fromisoformat(candidate)
+            return dt.strftime("%d %b %Y, %H:%M:%S")
+        except ValueError:
+            return raw
+
     def _render_run_section(self, run: Dict[str, object], run_num: int) -> str:
         context = run.get("context", {}) if isinstance(run.get("context"), dict) else {}
         metrics = run.get("metrics", []) if isinstance(run.get("metrics"), list) else []
         thresholds = run.get("thresholds", {}) if isinstance(run.get("thresholds"), dict) else {}
         screenshots = context.get("screenshots", []) if isinstance(context.get("screenshots"), list) else []
+        added_urls = context.get("added_book_urls") if isinstance(context.get("added_book_urls"), list) else []
+
+        run_status_raw = str(context.get("run_status") or run.get("run_status") or "PASSED").upper()
+        run_status = "FAILED" if run_status_raw == "FAILED" else "PASSED"
+        failure_details = context.get("failure_details")
+        has_failure_details = run_status == "FAILED" and bool(failure_details)
+
+        expected_count = context.get("expected_count")
+        added_books_count = context.get("added_books_count")
+
+        filtered_context: Dict[str, object] = {}
+        for key, value in context.items():
+            if key in {"screenshots", "added_book_urls", "failure_details", "run_status"}:
+                continue
+            # Avoid duplicate count presentation when both represent the same number.
+            if key == "added_books_count" and expected_count is not None and value == expected_count:
+                continue
+            if key == "added_books_count" and isinstance(added_urls, list) and value == len(added_urls):
+                continue
+            filtered_context[key] = value
+
+        urls_html = ""
+        if added_urls:
+            urls_items = "".join(
+                f"<li><a href='{html.escape(str(url))}' target='_blank' rel='noopener noreferrer'>{html.escape(str(url))}</a></li>"
+                for url in added_urls
+            )
+            urls_html = (
+                "<div class='section-label'>Added Book URLs</div>"
+                "<div class='urls-panel'><ol class='urls-list'>"
+                f"{urls_items}"
+                "</ol></div>"
+            )
 
         # Context chips
         ctx_items = "".join(
@@ -62,8 +113,7 @@ class PerformanceHtmlReportBuilder:
             f"<div class='ctx-key'>{html.escape(str(k))}</div>"
             f"<div class='ctx-val'>{html.escape(str(v))}</div>"
             f"</div>"
-            for k, v in context.items()
-            if k != "screenshots"
+            for k, v in filtered_context.items()
         ) or "<div class='ctx-item'><div class='ctx-val' style='color:#94a3b8'>No context</div></div>"
 
         # Metric rows with progress bars
@@ -118,6 +168,18 @@ class PerformanceHtmlReportBuilder:
             "<p style='color:#94a3b8;font-size:0.84rem'>No screenshots for this run.</p>"
         )
 
+        failure_html = ""
+        if has_failure_details:
+            failure_html = (
+                "<div class='section-label'>Failure Details</div>"
+                "<div class='failure-box'>"
+                f"<pre>{html.escape(str(failure_details))}</pre>"
+                "</div>"
+            )
+
+        status_class = "run-result-failed" if run_status == "FAILED" else "run-result-passed"
+        status_text = "FAILED" if run_status == "FAILED" else "PASSED"
+
         return (
             f"<article class='run'>"
             f"<div class='run-header'>"
@@ -125,16 +187,19 @@ class PerformanceHtmlReportBuilder:
             f"<div class='run-meta'>"
             f"<div class='run-title'>{html.escape(str(run.get('test_name', 'automation_test')))}</div>"
             f"<div class='run-ts'>"
-            f"<span>&#9654; {html.escape(str(run.get('started_at', '')))}</span>"
-            f"<span>&#9632; {html.escape(str(run.get('finished_at', '')))}</span>"
+            f"<span>&#9654; {html.escape(self._format_datetime(run.get('started_at')))}</span>"
+            f"<span>&#9632; {html.escape(self._format_datetime(run.get('finished_at')))}</span>"
             f"</div>"
             f"</div>"
+            f"<div class='run-result {status_class}'>{status_text}</div>"
             f"<div class='run-pills'></div>"
             f"<div class='run-toggle'>&#9660;</div>"
             f"</div>"
             f"<div class='run-body'>"
+            f"{urls_html}"
             f"<div class='section-label'>Context</div>"
             f"<div class='ctx-grid'>{ctx_items}</div>"
+            f"{failure_html}"
             f"<div class='section-label'>Performance Metrics</div>"
             f"<div class='metrics-wrap'>"
             f"<table>"

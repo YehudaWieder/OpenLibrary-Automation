@@ -21,6 +21,13 @@ from utils.performance.performance_repository import PerformanceRepository
 from utils.performance.performance_html_report import PerformanceHtmlReportBuilder
 from utils.performance.report_opener import ReportOpener
 from utils.performance.performance_helper import PerformanceHelper
+from utils.performance.run_lifecycle import (
+    create_run_state,
+    finalize_run_context,
+    mark_run_success,
+    mark_run_failed,
+    persist_and_publish_report,
+)
 from config import Config
 
 # Setup Logging
@@ -30,12 +37,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("MainRunner")
 
+
 async def run_test():
     perf_helper = PerformanceHelper()
     performance_repo = PerformanceRepository()
     html_report_builder = PerformanceHtmlReportBuilder()
     report_opener = ReportOpener()
-    should_persist_report = False
+    run_state = create_run_state()
     
     async with async_playwright() as p:
         # Setup Browser
@@ -53,9 +61,10 @@ async def run_test():
         )
 
         try:
+            perf_helper.set_run_context(run_status="PASSED", failure_details="")
+
             # Login Phase
             await prepare_authenticated_session()
-            should_persist_report = True
 
             # Clear existing reading lists to prevent toggle issues
             await reset_reading_lists()
@@ -84,14 +93,11 @@ async def run_test():
             )
 
             if not book_urls:
-                logger.error("No books found matching criteria. Stopping test.")
-                return
+                raise RuntimeError("No books found matching criteria")
 
             # Action Phase: Add to Reading List
             for url in book_urls:
-                await add_books_to_reading_list(
-                    [url],
-                )
+                await add_books_to_reading_list([url])
                 await measure_page_performance(
                     page=page,
                     url=url,
@@ -104,34 +110,42 @@ async def run_test():
             )
 
             # Assertion Phase
-            await assert_reading_list_count(
-                expected_count=len(book_urls),
-            )
+            await assert_reading_list_count(expected_count=len(book_urls))
             await measure_page_performance(
                 page=page,
                 url=f"{Config.BASE_URL}/account/books",
                 threshold_ms=2000,
             )
 
+            mark_run_success(run_state)
             logger.info("TEST PASSED: Books successfully added to reading list.")
 
+        except asyncio.CancelledError:
+            mark_run_failed(run_state, perf_helper, "Run cancelled (asyncio.CancelledError)")
+            logger.warning("Run cancelled (asyncio.CancelledError)")
+            raise
+
+        except KeyboardInterrupt:
+            mark_run_failed(run_state, perf_helper, "Run interrupted by user (KeyboardInterrupt)")
+            logger.warning("Run interrupted by user (KeyboardInterrupt)")
+            raise
+
         except LoginFailedError as e:
-            logger.error("Login failed, skipping performance collection and report persistence: %s", e)
+            mark_run_failed(run_state, perf_helper, f"Login failed: {e}")
+            logger.error("Login failed: %s", e)
 
         except Exception as e:
+            mark_run_failed(run_state, perf_helper, str(e))
             logger.error(f"An error occurred during execution: {e}")
         
         finally:
-            if should_persist_report:
-                run_entry = perf_helper.build_run_entry(test_name="automation_test")
-                report_data = performance_repo.append_run(run_entry, perf_helper.thresholds)
-                try:
-                    html_path = html_report_builder.generate_from_report_data(report_data)
-                    report_opener.open_file(html_path)
-                except Exception as report_error:
-                    logger.warning("Could not open HTML report automatically: %s", report_error)
-            else:
-                logger.info("Skipping performance report persistence because login did not succeed")
+            finalize_run_context(run_state, perf_helper)
+            persist_and_publish_report(
+                perf_helper,
+                performance_repo,
+                html_report_builder,
+                report_opener,
+            )
             logger.info("Closing browser.")
             clear_flow_context()
             await browser.close()

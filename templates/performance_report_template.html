@@ -284,6 +284,30 @@
 
     .run-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
+    .run-result {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .run-result-passed {
+      color: var(--ok);
+      background: var(--ok-bg);
+      border-color: var(--ok-border);
+    }
+    .run-result-failed {
+      color: #b91c1c;
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -345,6 +369,38 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 8px;
+    }
+
+    .urls-panel {
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: var(--surface-2);
+      padding: 10px 12px;
+      max-height: 210px;
+      overflow: auto;
+    }
+
+    .urls-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .urls-list li {
+      color: var(--text-2);
+      font-size: 0.82rem;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .urls-list a {
+      color: var(--brand-1);
+      text-decoration: none;
+    }
+
+    .urls-list a:hover {
+      text-decoration: underline;
     }
 
     .ctx-item {
@@ -444,6 +500,23 @@
     .status-exceeded { background: var(--warn-bg);   color: var(--warn); border: 1px solid var(--warn-border); }
     .status-na       { background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border);    }
 
+    .failure-box {
+      border: 1px solid #fecaca;
+      border-radius: var(--r-md);
+      background: #fff7f7;
+      padding: 10px 12px;
+    }
+
+    .failure-box pre {
+      margin: 0;
+      color: #991b1b;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+    }
+
     /* ── Screenshots ──────────────────────────────── */
     .shots {
       display: grid;
@@ -488,6 +561,7 @@
       .run-body { padding: 0 14px 16px; }
       .run-badge { width: 34px; height: 34px; font-size: 0.7rem; }
       .run-pills { display: none; }
+      .run-result { font-size: 0.62rem; padding: 3px 8px; }
       .metric-bar-track { max-width: 80px; }
       .ctx-grid { grid-template-columns: 1fr; }
       .shots { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
